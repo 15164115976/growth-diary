@@ -262,6 +262,40 @@ Page({
     this.setData(patch);
   },
 
+  /** 在计划页直接打卡，不跳页签 */
+  planCheckIn(e) {
+    const type = e.currentTarget.dataset.type;
+    const t = store.careTypeOf(type);
+    const item = this.data.planItems.find((x) => x.key === type);
+    const amount = item && item.amount ? `（${item.amount}）` : '';
+
+    wx.showModal({
+      title: `记一次${t.name}`,
+      editable: true,
+      placeholderText: amount ? `备注，默认：${item.amount}` : '备注（可留空）',
+      confirmText: '记下',
+      success: (res) => {
+        if (!res.confirm) return;
+        const note = (res.content || '').trim() || (item ? item.amount : '');
+        store.addCareLog(this.data.id, { type, note });
+        wx.vibrateShort && wx.vibrateShort({ type: 'light' });
+        wx.showToast({ title: '已完成一次', icon: 'success' });
+        this.load();
+      },
+    });
+  },
+
+  /** 从计划项进入编辑（改周期/用量） */
+  editPlanItem(e) {
+    const key = e.currentTarget.dataset.type;
+    const idx = this.data.planItems.findIndex((x) => x.key === key);
+    if (idx < 0) return;
+    if (!this.data.planItems[idx].enabled) {
+      this.setData({ [`planItems[${idx}].enabled`]: true });
+    }
+    wx.showToast({ title: '改好后点「保存计划」', icon: 'none' });
+  },
+
   onEvery(e) {
     const key = e.currentTarget.dataset.key;
     const idx = this.data.planItems.findIndex((x) => x.key === key);

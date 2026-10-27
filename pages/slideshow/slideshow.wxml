@@ -10,7 +10,7 @@
         wx:if="{{item.src}}"
         class="slide-img {{item.out ? 'out' : ''}} {{item.dir === 'out' ? 'zoom-out' : 'zoom-in'}}"
         src="{{item.src}}"
-        mode="aspectFill"
+        mode="aspectFit"
       ></image>
     </view>
 
@@ -20,10 +20,10 @@
       class="live-video"
       src="{{liveVideo}}"
       autoplay
-      muted
+      muted="{{!liveSound}}"
       controls="{{false}}"
       show-center-play-btn="{{false}}"
-      object-fit="cover"
+      object-fit="contain"
       bindended="onLiveEnd"
     ></video>
 
@@ -36,7 +36,7 @@
       muted
       controls="{{false}}"
       show-center-play-btn="{{false}}"
-      object-fit="cover"
+      object-fit="contain"
       bindended="onAiVideoEnd"
     ></video>
   </view>

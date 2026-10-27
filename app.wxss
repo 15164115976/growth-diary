@@ -22,7 +22,18 @@ page {
   --shadow: 0 8rpx 32rpx rgba(46, 58, 44, 0.07);
   --shadow-lift: 0 16rpx 48rpx rgba(46, 58, 44, 0.12);
 
-  background: var(--bg);
+  /* 液态玻璃：半透明底 + 顶部一道高光 + 柔和外阴影 */
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-bg-strong: rgba(255, 255, 255, 0.86);
+  --glass-border: rgba(255, 255, 255, 0.78);
+  --glass-hi: inset 0 1rpx 0 rgba(255, 255, 255, 0.95);
+  --glass-shadow: 0 10rpx 32rpx rgba(46, 58, 44, 0.09);
+
+  background:
+    radial-gradient(1200rpx 900rpx at 88% -8%, rgba(62, 124, 90, 0.11), transparent 62%),
+    radial-gradient(900rpx 700rpx at -10% 28%, rgba(217, 123, 60, 0.08), transparent 62%),
+    radial-gradient(800rpx 600rpx at 50% 110%, rgba(27, 160, 150, 0.06), transparent 60%),
+    var(--bg);
   color: var(--ink);
   font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', 'Source Han Sans SC',
     'Noto Sans SC', sans-serif;
@@ -79,6 +90,23 @@ scroll-view {
   box-shadow: var(--shadow);
 }
 
+/* 液态玻璃容器：iOS/新版 Android 上会真的模糊背景，旧机型退化成半透明白 */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(28rpx) saturate(175%);
+  -webkit-backdrop-filter: blur(28rpx) saturate(175%);
+  border: 1rpx solid var(--glass-border);
+  box-shadow: var(--glass-hi), var(--glass-shadow);
+}
+
+.glass-strong {
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(36rpx) saturate(180%);
+  -webkit-backdrop-filter: blur(36rpx) saturate(180%);
+  border: 1rpx solid var(--glass-border);
+  box-shadow: var(--glass-hi), var(--glass-shadow);
+}
+
 .muted {
   color: var(--ink-3);
 }
@@ -115,9 +143,9 @@ scroll-view {
 }
 
 .btn-primary {
-  background: var(--brand);
+  background: linear-gradient(180deg, #4c9268 0%, #35694c 100%);
   color: #fff;
-  box-shadow: 0 10rpx 28rpx rgba(62, 124, 90, 0.28);
+  box-shadow: inset 0 2rpx 0 rgba(255, 255, 255, 0.26), 0 12rpx 28rpx rgba(62, 124, 90, 0.28);
 }
 
 .btn-ghost {

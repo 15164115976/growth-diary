@@ -145,6 +145,18 @@
   </view>
 
   <view class="cf-body" style="padding-bottom:{{safeBottom + 20}}px">
+    <view class="cf-score" wx:if="{{refPhoto}}">
+      <block wx:if="{{compareScore !== null}}">
+        <view class="cs-dot {{compareScore >= 75 ? 'good' : (compareScore >= 55 ? 'mid' : 'low')}}"></view>
+        <text>和上次构图 {{compareScore}}% 接近</text>
+        <text class="cs-hint">{{compareScore >= 75 ? '机位很稳' : (compareScore >= 55 ? '略有偏移' : '角度差得比较多')}}</text>
+      </block>
+      <block wx:else>
+        <view class="cs-dot mid"></view>
+        <text>正在比对上次的构图…</text>
+      </block>
+    </view>
+
     <input
       class="cf-input"
       placeholder="写一句今天的变化（可选）"

@@ -104,3 +104,54 @@ function normalizeOrientation(src) {
 }
 
 module.exports.normalizeOrientation = normalizeOrientation;
+
+/**
+ * 构图相似度：把两张图缩到同一尺寸的灰度图，比平均绝对差
+ *
+ * 这是「判断是否同一角度」的可行做法 —— 小程序拿不到 LiDAR 数据，
+ * 但「这张和上次拍得像不像」是可以算的，对齐度低就说明机位变了。
+ *
+ * @returns {Promise<number|null>} 0~1，1 表示几乎完全一致
+ */
+function loadGray(path, size) {
+  return new Promise((resolve) => {
+    let canvas = null;
+    try {
+      canvas = wx.createOffscreenCanvas({ type: '2d', width: size, height: size });
+    } catch (e) {
+      return resolve(null);
+    }
+    if (!canvas) return resolve(null);
+
+    const ctx = canvas.getContext('2d');
+    const img = canvas.createImage();
+    img.onload = () => {
+      try {
+        ctx.drawImage(img, 0, 0, size, size);
+        const data = ctx.getImageData(0, 0, size, size).data;
+        const gray = new Float32Array(size * size);
+        for (let i = 0; i < size * size; i += 1) {
+          gray[i] = 0.299 * data[i * 4] + 0.587 * data[i * 4 + 1] + 0.114 * data[i * 4 + 2];
+        }
+        resolve(gray);
+      } catch (err) {
+        resolve(null);
+      }
+    };
+    img.onerror = () => resolve(null);
+    img.src = path;
+  });
+}
+
+async function similarity(pathA, pathB, size = 32) {
+  if (!pathA || !pathB) return null;
+  const [ga, gb] = await Promise.all([loadGray(pathA, size), loadGray(pathB, size)]);
+  if (!ga || !gb) return null;
+
+  let diff = 0;
+  for (let i = 0; i < ga.length; i += 1) diff += Math.abs(ga[i] - gb[i]);
+  const mae = diff / ga.length / 255;
+  return Math.max(0, Math.min(1, 1 - mae));
+}
+
+module.exports.similarity = similarity;

@@ -83,6 +83,18 @@ Page({
     this.setData({ 'settings.gravityFlip': v });
   },
 
+  onSoundChange(e) {
+    const v = e.detail.value;
+    store.saveSettings({ liveSound: v });
+    this.setData({ 'settings.liveSound': v });
+  },
+
+  onLiveAutoChange(e) {
+    const v = e.detail.value;
+    store.saveSettings({ liveAuto: v });
+    this.setData({ 'settings.liveAuto': v });
+  },
+
   onLiveChange(e) {
     const v = e.detail.value;
     store.saveSettings({ livePhoto: v });

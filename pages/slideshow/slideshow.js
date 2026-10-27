@@ -25,6 +25,7 @@ Page({
     hasLive: false,
     livePlaying: false,
     liveAuto: false,
+    liveSound: true,
     landscape: false,
     calendarVisible: false,
     calendarMonths: [],
@@ -71,6 +72,7 @@ Page({
         aiMode: !!settings.aiTransition,
         aiConfigured: !!settings.aiEndpoint,
         liveAuto: settings.liveAuto !== false,
+        liveSound: settings.liveSound !== false,
         interval: settings.autoPlayInterval || 3200,
       },
       () => {

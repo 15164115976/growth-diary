@@ -134,11 +134,15 @@
       <view class="plan-item" wx:for="{{planItems}}" wx:key="key">
         <view class="pl-head">
           <text class="pl-ico">{{item.icon}}</text>
-          <view class="pl-title">
-            <text class="pl-name">{{item.name}}</text>
+          <view class="pl-title" catchtap="editPlanItem" data-type="{{item.key}}">
+            <view class="pl-name-row">
+              <text class="pl-name">{{item.name}}</text>
+              <text class="pl-edit">改</text>
+            </view>
             <text class="pl-desc" wx:if="{{item.enabled}}">每 {{item.every}} 天一次</text>
             <text class="pl-desc" wx:else>未启用</text>
           </view>
+          <view class="pl-done" catchtap="planCheckIn" data-type="{{item.key}}">完成</view>
           <switch
             checked="{{item.enabled}}"
             color="#3E7C5A"

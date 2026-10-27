@@ -15,6 +15,7 @@ Page({
     fromAuto: false,
     liveVideo: '',
     coverLive: '',
+    liveSound: true,
     driftSheet: false,
     driftStory: '',
     driftBusy: false,
@@ -118,6 +119,7 @@ Page({
 
     const coverLive =
       record.latest && record.latest.live && record.latest.live.path ? record.latest.live.path : '';
+    const liveSound = store.getSettings().liveSound !== false;
 
     const gapDays = record.latest ? dateUtil.sinceDays(record.latest.ts) : null;
     const stats = {
@@ -132,6 +134,7 @@ Page({
       timeline,
       stats,
       coverLive,
+      liveSound,
       emojiList: emojiSet,
     });
 

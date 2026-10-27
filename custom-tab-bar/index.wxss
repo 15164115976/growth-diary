@@ -16,10 +16,11 @@
   right: 0;
   top: 0;
   bottom: 0;
-  background: rgba(255, 255, 255, 0.94);
-  border-top: 1rpx solid rgba(232, 228, 218, 0.9);
-  backdrop-filter: blur(20rpx);
-  -webkit-backdrop-filter: blur(20rpx);
+  background: rgba(255, 255, 255, 0.7);
+  border-top: 1rpx solid rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(48rpx) saturate(180%);
+  -webkit-backdrop-filter: blur(48rpx) saturate(180%);
+  box-shadow: 0 -10rpx 40rpx rgba(46, 58, 44, 0.07);
 }
 
 .tab {

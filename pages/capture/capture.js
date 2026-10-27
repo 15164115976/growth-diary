@@ -39,6 +39,7 @@ Page({
     splitPos: 50,
     comparing: false,
     saving: false,
+    compareScore: null,
     todayText: '',
   },
 
@@ -246,10 +247,19 @@ Page({
       capturedFrom: 'camera',
       note: '',
       comparing: !!this.data.refPhoto,
+      compareScore: null,
       splitPos: 50,
       shooting: false,
       recording: false,
     });
+
+    // 和上一次比构图相似度（小程序拿不到激光测距，用「像不像」代替「近不近」）
+    if (this.data.refPhoto) {
+      imageUtil.similarity(finalStill, this.data.refPhoto.path).then((score) => {
+        if (score === null || this.data.mode !== 'confirm') return;
+        this.setData({ compareScore: Math.round(score * 100) });
+      });
+    }
   },
 
   pickFromAlbum() {

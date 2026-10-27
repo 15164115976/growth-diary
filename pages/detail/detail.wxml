@@ -148,7 +148,7 @@
       class="live-full"
       src="{{liveVideo}}"
       autoplay
-      muted
+      muted="{{!liveSound}}"
       controls="{{false}}"
       show-center-play-btn="{{false}}"
       object-fit="contain"

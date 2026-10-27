@@ -126,11 +126,14 @@
 }
 
 .m-item {
-  background: #fff;
-  border-radius: 26rpx;
+  border-radius: 28rpx;
   margin-bottom: 16rpx;
-  box-shadow: var(--shadow);
   overflow: hidden;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(26rpx) saturate(170%);
+  -webkit-backdrop-filter: blur(26rpx) saturate(170%);
+  border: 1rpx solid rgba(255, 255, 255, 0.8);
+  box-shadow: inset 0 1rpx 0 rgba(255, 255, 255, 0.95), 0 10rpx 30rpx rgba(46, 58, 44, 0.08);
 }
 
 .m-head {
@@ -231,10 +234,13 @@
 /* ---------- 周期卡 ---------- */
 .cycle-card {
   margin: 28rpx 32rpx 0;
-  background: #fff;
-  border-radius: 28rpx;
+  border-radius: 30rpx;
   padding: 26rpx 22rpx 10rpx;
-  box-shadow: var(--shadow);
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(26rpx) saturate(170%);
+  -webkit-backdrop-filter: blur(26rpx) saturate(170%);
+  border: 1rpx solid rgba(255, 255, 255, 0.8);
+  box-shadow: inset 0 1rpx 0 rgba(255, 255, 255, 0.95), 0 10rpx 30rpx rgba(46, 58, 44, 0.08);
 }
 
 .cycle-head {
@@ -446,8 +452,11 @@
 
 .editor {
   width: 100%;
-  background: #fff;
+  background: rgba(250, 249, 245, 0.93);
+  backdrop-filter: blur(50rpx) saturate(180%);
+  -webkit-backdrop-filter: blur(50rpx) saturate(180%);
   border-radius: 40rpx 40rpx 0 0;
+  border-top: 1rpx solid rgba(255, 255, 255, 0.9);
   padding: 18rpx 36rpx calc(32rpx + env(safe-area-inset-bottom));
   animation: sheetUp 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -537,11 +546,14 @@
 }
 
 .plan-item {
-  background: #fff;
-  border-radius: 26rpx;
+  border-radius: 28rpx;
   margin-bottom: 16rpx;
-  box-shadow: var(--shadow);
   overflow: hidden;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(26rpx) saturate(170%);
+  -webkit-backdrop-filter: blur(26rpx) saturate(170%);
+  border: 1rpx solid rgba(255, 255, 255, 0.8);
+  box-shadow: inset 0 1rpx 0 rgba(255, 255, 255, 0.95), 0 10rpx 30rpx rgba(46, 58, 44, 0.08);
 }
 
 .pl-head {
@@ -644,4 +656,44 @@
 
 .pa-btn.dim {
   opacity: 0.55;
+}
+
+/* ---------- 计划项：完成 / 改 ---------- */
+.pl-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.pl-edit {
+  font-size: 17rpx;
+  color: var(--brand);
+  padding: 2rpx 10rpx;
+  border-radius: 10rpx;
+  background: var(--brand-soft);
+}
+
+.pl-done {
+  height: 58rpx;
+  padding: 0 24rpx;
+  border-radius: 29rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22rpx;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(180deg, #4c9268 0%, #35694c 100%);
+  box-shadow: inset 0 2rpx 0 rgba(255, 255, 255, 0.24), 0 6rpx 16rpx rgba(62, 124, 90, 0.26);
+  flex-shrink: 0;
+  margin-right: 8rpx;
+}
+
+.pl-done:active {
+  transform: scale(0.94);
+  opacity: 0.9;
+}
+
+.pl-head .pl-title:active {
+  opacity: 0.7;
 }

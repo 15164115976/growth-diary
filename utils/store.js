@@ -636,6 +636,7 @@ const DEFAULT_SETTINGS = {
   livePhoto: true, // 拍照后录制动态片段
   liveDuration: 2200,
   liveAuto: true, // 幻灯片里换图时自动播动图
+  liveSound: true, // 播放动图时是否出声
   // 幻灯片
   aiTransition: false,
   aiEndpoint: '',

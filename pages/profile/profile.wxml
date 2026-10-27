@@ -82,9 +82,25 @@
     <view class="row">
       <view class="row-left">
         <text class="row-name">动态图（Live）</text>
-        <text class="row-desc">每次拍完多录两秒，幻灯片里照片会「活」一下</text>
+        <text class="row-desc">每次拍完多录两秒，看照片时会「活」一下</text>
       </view>
       <switch checked="{{settings.livePhoto}}" color="#3E7C5A" bindchange="onLiveChange" />
+    </view>
+
+    <view class="row">
+      <view class="row-left">
+        <text class="row-name">动图自动播放</text>
+        <text class="row-desc">看图时切到下一张自动播一次</text>
+      </view>
+      <switch checked="{{settings.liveAuto}}" color="#3E7C5A" bindchange="onLiveAutoChange" />
+    </view>
+
+    <view class="row">
+      <view class="row-left">
+        <text class="row-name">动图声音</text>
+        <text class="row-desc">播放时放出拍摄当下的环境音，关掉则静音</text>
+      </view>
+      <switch checked="{{settings.liveSound}}" color="#3E7C5A" bindchange="onSoundChange" />
     </view>
 
     <view class="row">

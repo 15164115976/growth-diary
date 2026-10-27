@@ -1,0 +1,60 @@
+<view class="page">
+  <view style="height:{{safeTop}}px"></view>
+
+  <view class="nav">
+    <view class="nav-btn" bindtap="close"><view class="x"></view></view>
+    <text class="nav-title">调整图片</text>
+    <view class="nav-save {{saving ? 'busy' : ''}}" bindtap="save">{{saving ? '…' : '完成'}}</view>
+  </view>
+
+  <view
+    class="stage"
+    id="stage"
+    bindtouchstart="onTouchStart"
+    bindtouchmove="onTouchMove"
+    bindtouchend="onTouchEnd"
+    bindtouchcancel="onTouchEnd"
+  >
+    <image
+      wx:if="{{ready}}"
+      class="photo"
+      src="{{src}}"
+      mode="scaleToFill"
+      style="width:{{baseW}}px; height:{{baseH}}px; margin-left:{{offW}}px; margin-top:{{offH}}px; transform: translate({{tx}}px, {{ty}}px) scale({{scale}})"
+    />
+
+    <view
+      wx:if="{{ready}}"
+      class="crop-box"
+      style="left:{{boxX}}px; top:{{boxY}}px; width:{{boxW}}px; height:{{boxH}}px"
+    >
+      <view class="gv g1"></view>
+      <view class="gv g2"></view>
+      <view class="gh g1"></view>
+      <view class="gh g2"></view>
+      <view class="corner tl"></view>
+      <view class="corner tr"></view>
+      <view class="corner bl"></view>
+      <view class="corner br"></view>
+    </view>
+
+    <view class="stage-tip" wx:if="{{ready}}">拖动移位 · 双指缩放</view>
+  </view>
+
+  <view class="tools" style="padding-bottom:{{safeBottom + 20}}px">
+    <scroll-view scroll-x class="ratios" enhanced show-scrollbar="{{false}}">
+      <view class="ratio-row">
+        <view
+          class="ratio {{ratio === item.key ? 'on' : ''}}"
+          wx:for="{{ratios}}"
+          wx:key="key"
+          data-key="{{item.key}}"
+          bindtap="pickRatio"
+        >
+          {{item.label}}
+        </view>
+      </view>
+    </scroll-view>
+    <view class="reset" bindtap="reset">复原</view>
+  </view>
+</view>

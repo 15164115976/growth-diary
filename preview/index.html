@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>春生夏长 · 界面预览</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --bg: #f6f4ef;
+    --bg-deep: #efece4;
+    --card: #ffffff;
+    --ink: #232a22;
+    --ink2: #5b6459;
+    --ink3: #929a90;
+    --line: #e8e4da;
+    --brand: #3e7c5a;
+    --brand-deep: #2f6146;
+    --brand-soft: #e8f1eb;
+    --accent: #d97b3c;
+    --fish: #1ba096;
+    --fish-soft: #e6f6f4;
+  }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #101215;
+    color: #e8e6e1;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+  }
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px 70px;
+    background:
+      radial-gradient(900px 500px at 80% -10%, rgba(62,124,90,0.18), transparent 70%),
+      radial-gradient(700px 400px at 10% 100%, rgba(217,123,60,0.12), transparent 70%),
+      #101215;
+  }
+  header { text-align: center; margin-bottom: 26px; }
+  h1 { font-size: 26px; font-weight: 700; letter-spacing: 6px; margin: 0 0 8px; }
+  .sub { font-size: 13px; color: #7d857c; letter-spacing: 2px; }
+
+  .tabs { display: flex; gap: 8px; margin-bottom: 30px; flex-wrap: wrap; justify-content: center; }
+  .tabs button {
+    border: 1px solid #2a2f2a;
+    background: #191d1a;
+    color: #98a096;
+    font-size: 13px;
+    padding: 9px 20px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all .2s ease;
+    font-family: inherit;
+  }
+  .tabs button:hover { border-color: #3d4740; color: #c6cec3; }
+  .tabs button.on { background: #3e7c5a; border-color: #3e7c5a; color: #fff; font-weight: 600; }
+
+  .stage { display: flex; gap: 46px; align-items: flex-start; }
+
+  /* ---------------- 手机外壳 ---------------- */
+  .device {
+    position: relative;
+    width: 375px;
+    height: 812px;
+    border-radius: 46px;
+    background: #0a0c0a;
+    padding: 10px;
+    box-shadow: 0 40px 90px rgba(0,0,0,.6), 0 0 0 1px #2c322c inset;
+    flex-shrink: 0;
+  }
+  .screen {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 38px;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--ink);
+  }
+  .notch {
+    position: absolute;
+    top: 18px; left: 50%;
+    transform: translateX(-50%);
+    width: 116px; height: 28px;
+    background: #0a0c0a;
+    border-radius: 16px;
+    z-index: 100;
+  }
+  .statusbar {
+    position: absolute; top: 0; left: 0; right: 0; height: 44px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 26px; font-size: 12px; font-weight: 600; z-index: 90;
+    pointer-events: none; color: var(--ink);
+  }
+  .page {
+    position: absolute; inset: 0;
+    overflow: hidden;
+    display: none;
+    padding-bottom: 0;
+  }
+  .page.active { display: block; }
+  .scroll {
+    position: absolute; inset: 0;
+    overflow-y: auto; overflow-x: hidden;
+    scrollbar-width: none;
+  }
+  .scroll::-webkit-scrollbar { display: none; }
+
+  /* ---------------- 通用 ---------------- */
+  .pad { padding: 0 16px; }
+  .muted { color: var(--ink3); }
+  .mono { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+
+  /* ================= 主页 ================= */
+  .glow { position: absolute; pointer-events: none; border-radius: 50%; }
+  .g1 { top: -120px; right: -90px; width: 310px; height: 310px;
+        background: radial-gradient(circle, rgba(217,123,60,.16), transparent 70%); }
+  .g2 { top: 30px; left: -130px; width: 280px; height: 280px;
+        background: radial-gradient(circle, rgba(62,124,90,.14), transparent 70%); }
+
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 52px 18px 0; position: relative; }
+  .brand { font-size: 24px; font-weight: 700; letter-spacing: 2px; }
+  .brand-en { font-size: 9px; letter-spacing: 3px; color: var(--ink3); margin-top: 1px; }
+  .setbtn { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,.78);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+            box-shadow: 0 2px 8px rgba(46,58,44,.06); }
+  .setbtn i { display: block; width: 3px; height: 3px; border-radius: 50%; background: var(--ink2); }
+
+  .subline { display: flex; align-items: baseline; gap: 8px; padding: 10px 18px 4px; position: relative; }
+  .greeting { font-size: 13px; color: var(--ink2); font-weight: 500; }
+  .today { font-size: 11px; color: var(--ink3); }
+
+  .hero {
+    position: relative; margin: 12px 16px 4px; height: 228px; border-radius: 22px;
+    overflow: hidden; box-shadow: 0 8px 24px rgba(46,58,44,.12);
+    background: #0d3a3a;
+  }
+  .hero-photo {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at 42% 38%, rgba(120,220,205,.55), transparent 46%),
+      radial-gradient(circle at 70% 80%, rgba(24,120,110,.5), transparent 55%),
+      linear-gradient(160deg, #1d7d7a 0%, #0d4b4b 52%, #06262a 100%);
+    animation: heroZoom 14s ease-out both;
+  }
+  @keyframes heroZoom { from { transform: scale(1.06); } to { transform: scale(1); } }
+  .hero-fish { position: absolute; right: 36px; top: 52px; font-size: 92px; filter: drop-shadow(0 12px 24px rgba(0,0,0,.45)); }
+  .hero-shade { position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(20,26,20,.02) 0%, rgba(20,26,20,.14) 45%, rgba(18,24,18,.78) 100%); }
+  .hero-body { position: absolute; left: 0; right: 0; bottom: 0; padding: 16px 18px 18px; color: #fff; }
+  .hero-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .hero-tag { font-size: 10px; letter-spacing: 1.5px; padding: 3px 8px; border-radius: 4px;
+              background: rgba(255,255,255,.22); border: 1px solid rgba(255,255,255,.34); }
+  .hero-day { font-size: 12px; opacity: .9; }
+  .hero-name { font-size: 23px; font-weight: 700; letter-spacing: .5px; }
+  .hero-meta { font-size: 12px; color: rgba(255,255,255,.78); margin-top: 2px; }
+  .hero-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
+  .hero-last { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: rgba(255,255,255,.78); }
+  .pulse { width: 6px; height: 6px; border-radius: 50%; background: #7fd3a0; box-shadow: 0 0 0 0 rgba(127,211,160,.6); animation: pulse 2.2s infinite; }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(127,211,160,.55); }
+    70% { box-shadow: 0 0 0 7px rgba(127,211,160,0); }
+    100% { box-shadow: 0 0 0 0 rgba(127,211,160,0); }
+  }
+  .shoot { display: flex; align-items: center; gap: 6px; height: 38px; padding: 0 16px; border-radius: 19px;
+           background: rgba(255,255,255,.95); color: #1f2a1f; font-size: 13.5px; font-weight: 600;
+           box-shadow: 0 5px 12px rgba(0,0,0,.18); cursor: pointer; }
+  .shoot-ico { width: 13px; height: 13px; border-radius: 50%; border: 2.5px solid currentColor; opacity: .85; }
+
+  .section-head { display: flex; align-items: baseline; justify-content: space-between; padding: 20px 18px 2px; }
+  .section-title { font-size: 16px; font-weight: 700; }
+  .section-sub { font-size: 11px; color: var(--ink3); }
+
+  .group-head { display: flex; align-items: center; justify-content: space-between; padding: 13px 18px 8px; }
+  .group-left { display: flex; align-items: center; gap: 6px; }
+  .cat-bar { width: 3px; height: 13px; border-radius: 2px; }
+  .group-name { font-size: 13.5px; font-weight: 600; }
+  .group-hint { font-size: 10.5px; color: var(--ink3); }
+  .group-add { width: 26px; height: 26px; border-radius: 50%; background: rgba(255,255,255,.9);
+               display: flex; align-items: center; justify-content: center; font-size: 15px; color: var(--ink2);
+               box-shadow: 0 2px 6px rgba(46,58,44,.06); }
+
+  .rail { display: flex; gap: 10px; padding: 2px 18px 8px; overflow-x: auto; scrollbar-width: none; }
+  .rail::-webkit-scrollbar { display: none; }
+  .rec { width: 92px; flex-shrink: 0; }
+  .rec-thumb {
+    position: relative; width: 92px; height: 108px; border-radius: 13px; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 3px 10px rgba(46,58,44,.08);
+  }
+  .rec-thumb .big { font-size: 38px; }
+  .rec-badge { position: absolute; top: 5px; left: 5px; height: 16px; padding: 0 6px; border-radius: 5px;
+               background: rgba(62,124,90,.92); color: #fff; font-size: 9px; display: flex; align-items: center; }
+  .rec-count { position: absolute; right: 5px; bottom: 5px; padding: 1px 5px; border-radius: 4px;
+               background: rgba(0,0,0,.42); color: #fff; font-size: 9px; }
+  .rec-name { margin-top: 6px; font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rec-sub { font-size: 10px; color: var(--ink3); }
+  .rec-new-box { width: 92px; height: 108px; border-radius: 13px; border: 1px dashed #d8d3c7;
+                 display: flex; align-items: center; justify-content: center; font-size: 22px; color: #c9c3b6;
+                 background: rgba(255,255,255,.5); }
+
+  .footer-tip { text-align: center; font-size: 10.5px; color: var(--ink3); margin-top: 22px; letter-spacing: .5px; }
+
+  /* 底部 tabbar */
+  .tabbar {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 62px; z-index: 80;
+    display: flex; align-items: flex-start; padding-top: 6px;
+    background: rgba(255,255,255,.95); border-top: 1px solid rgba(232,228,218,.9);
+    backdrop-filter: blur(12px);
+  }
+  .tabbar .tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; color: #9aa196; font-size: 10.5px; }
+  .tabbar .tab.on { color: var(--brand); font-weight: 600; }
+  .leaf { width: 15px; height: 15px; border: 1.5px solid currentColor; border-radius: 0 50% 0 50%; transform: rotate(-45deg); margin: 3px 0 2px; }
+  .tab.on .leaf { background: currentColor; }
+  .film { width: 17px; height: 13px; border: 1.5px solid currentColor; border-radius: 3.5px; margin: 4px 0 3px; position: relative; }
+  .film::after { content: ''; position: absolute; bottom: 2.5px; left: 50%; transform: translateX(-50%); width: 7px; height: 1.5px; background: currentColor; border-radius: 1px; }
+  .tab.on .film { background: currentColor; }
+  .tab.on .film::after { background: #fff; }
+  .user-ico { position: relative; width: 17px; height: 17px; margin: 2px 0 2px; }
+  .user-ico::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 7px; height: 7px; border: 1.5px solid currentColor; border-radius: 50%; }
+  .user-ico::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 15px; height: 7px; border: 1.5px solid currentColor; border-bottom: none; border-radius: 8px 8px 0 0; }
+  .tab.on .user-ico::before, .tab.on .user-ico::after { background: currentColor; }
+
+  /* ================= 详情 ================= */
+  .d-hero { position: relative; height: 290px; overflow: hidden;
+    background:
+      radial-gradient(circle at 45% 35%, rgba(120,220,205,.5), transparent 45%),
+      linear-gradient(160deg, #1d7d7a 0%, #0d4b4b 55%, #06262a 100%); }
+  .d-hero .fish-big { position: absolute; left: 46%; top: 34%; font-size: 118px; transform: translate(-50%,-50%); filter: drop-shadow(0 16px 30px rgba(0,0,0,.45)); }
+  .d-grad { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(20,26,20,0) 30%, rgba(20,26,20,.6) 68%, rgba(16,22,16,.86) 100%); }
+  .back { position: absolute; top: 52px; left: 14px; width: 36px; height: 36px; border-radius: 50%;
+          background: rgba(255,255,255,.82); display: flex; align-items: center; justify-content: center;
+          box-shadow: 0 2px 8px rgba(0,0,0,.1); z-index: 30; }
+  .chev { width: 9px; height: 9px; border-left: 2px solid #232a22; border-bottom: 2px solid #232a22; transform: rotate(45deg); margin-left: -2px; border-radius: 1px; }
+  .d-info { position: absolute; left: 18px; right: 18px; bottom: 46px; display: flex; align-items: center; gap: 11px; color: #fff; }
+  .avatar { position: relative; width: 48px; height: 48px; border-radius: 15px; background: rgba(255,255,255,.92);
+            display: flex; align-items: center; justify-content: center; font-size: 25px; box-shadow: 0 4px 12px rgba(0,0,0,.18); }
+  .avatar::after { content: ''; position: absolute; right: -3px; bottom: -3px; width: 15px; height: 15px; border-radius: 50%;
+                   background: #3e7c5a; border: 2px solid #fff; }
+  .d-name { font-size: 24px; font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,.3); }
+  .d-sub { font-size: 12px; color: rgba(255,255,255,.82); margin-top: 2px; }
+
+  .stats { position: relative; display: flex; align-items: center; margin: -32px 16px 0; padding: 13px 0;
+           background: #fff; border-radius: 16px; box-shadow: 0 8px 24px rgba(46,58,44,.12); z-index: 5; }
+  .stat { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px; }
+  .stat-num { font-size: 20px; font-weight: 700; }
+  .stat-label { font-size: 10px; color: var(--ink3); }
+  .stat-line { width: 1px; height: 22px; background: var(--line); }
+
+  .actions { display: flex; gap: 9px; padding: 14px 16px 0; }
+  .action { flex: 1; background: #fff; border-radius: 14px; padding: 13px 9px 12px; display: flex; flex-direction: column;
+            align-items: center; box-shadow: 0 4px 16px rgba(46,58,44,.07); }
+  .action-ico { width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+                font-size: 19px; margin-bottom: 7px; background: var(--fish-soft); }
+  .action-name { font-size: 12.5px; font-weight: 600; }
+  .action-desc { font-size: 9.5px; color: var(--ink3); margin-top: 1px; }
+
+  .tl-head { display: flex; align-items: baseline; justify-content: space-between; padding: 23px 18px 10px; }
+  .tl-title { font-size: 16px; font-weight: 700; }
+  .tl-count { font-size: 10.5px; color: var(--ink3); }
+  .tl { display: flex; flex-wrap: wrap; justify-content: space-between; padding: 0 16px; }
+  .tl-item { position: relative; width: 31.4%; padding-bottom: 31.4%; border-radius: 11px; overflow: hidden; margin-bottom: 11px;
+             background: var(--bg-deep); }
+  .tl-item > .fill { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+  .tl-badge { position: absolute; left: 4px; bottom: 4px; padding: 1px 5px; border-radius: 4px;
+              background: rgba(0,0,0,.46); color: #fff; font-size: 8.5px; z-index: 2; }
+
+  .bbar { position: absolute; left: 0; right: 0; bottom: 0; display: flex; align-items: center; gap: 8px;
+          padding: 9px 16px 16px; background: rgba(255,255,255,.96); border-top: 1px solid var(--line); z-index: 60; }
+  .bbar-side { width: 54px; height: 48px; border-radius: 13px; background: var(--bg); display: flex; flex-direction: column;
+               align-items: center; justify-content: center; gap: 1px; }
+  .bbar-side .ico { font-size: 15px; }
+  .bbar-side .tx { font-size: 9px; color: var(--ink2); }
+  .bbar-main { flex: 1; height: 48px; border-radius: 13px; background: var(--brand); color: #fff; display: flex;
+               align-items: center; justify-content: center; gap: 7px; box-shadow: 0 5px 13px rgba(62,124,90,.3); }
+  .bbar-ring { width: 15px; height: 15px; border-radius: 50%; border: 2.5px solid rgba(255,255,255,.92); }
+  .bbar-main .tx { font-size: 15px; font-weight: 700; letter-spacing: 1px; }
+  .bbar-main .sb { font-size: 9.5px; color: rgba(255,255,255,.7); margin-top: 2px; }
+
+  /* ================= 拍照 ================= */
+  .cam { position: absolute; inset: 0; background:
+      radial-gradient(circle at 50% 42%, #2b4a42 0%, #16241f 55%, #080d0b 100%); }
+  .cam-ghost { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+  .ref-layer { position: absolute; inset: 0; opacity: .38; transition: opacity .28s ease;
+    background:
+      radial-gradient(circle at 42% 40%, rgba(150,235,220,.75), transparent 42%),
+      linear-gradient(160deg, #247e7b 0%, #11524f 60%, #0a3033 100%);
+    filter: blur(3px) saturate(.4) brightness(1.32) contrast(.86); }
+  .ref-fish { position: absolute; left: 50%; top: 44%; transform: translate(-50%,-50%);
+              font-size: 96px; filter: blur(2px) brightness(1.6) saturate(.5); opacity: .85; }
+  .live-fish { position: absolute; left: 52%; top: 46%; transform: translate(-50%,-50%); font-size: 92px;
+               filter: drop-shadow(0 10px 22px rgba(0,0,0,.5)); transition: transform .30s ease, left .30s ease; }
+  .grid-line { position: absolute; background: rgba(255,255,255,.14); }
+  .gv { top: 0; bottom: 0; width: 1px; }
+  .gh { left: 0; right: 0; height: 1px; }
+  .corner { position: absolute; width: 20px; height: 20px; border: 1.5px solid rgba(255,255,255,.55); }
+  .c-tl { left: 10%; top: 16%; border-right: none; border-bottom: none; border-radius: 5px 0 0 0; }
+  .c-tr { right: 10%; top: 16%; border-left: none; border-bottom: none; border-radius: 0 5px 0 0; }
+  .c-bl { left: 10%; bottom: 26%; border-right: none; border-top: none; border-radius: 0 0 0 5px; }
+  .c-br { right: 10%; bottom: 26%; border-left: none; border-top: none; border-radius: 0 0 5px 0; }
+  .cam-top { position: absolute; top: 44px; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between;
+             padding: 0 14px 10px; background: linear-gradient(180deg, rgba(0,0,0,.55), transparent); z-index: 20; }
+  .cam-btn { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,.16);
+             display: flex; align-items: center; justify-content: center; color: #fff; font-size: 15px; backdrop-filter: blur(6px); }
+  .cam-title { text-align: center; color: #fff; }
+  .cam-title .t { font-size: 15px; font-weight: 600; }
+  .cam-title .s { font-size: 10px; color: rgba(255,255,255,.62); }
+  .ref-tip { position: absolute; left: 14px; right: 14px; top: 26%; z-index: 15;
+             padding: 8px 10px; border-radius: 10px; background: rgba(14,18,14,.42); backdrop-filter: blur(6px);
+             color: #fff; text-align: center; }
+  .ref-tip .l { display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 11.5px; font-weight: 600; }
+  .ref-tip .d { width: 5px; height: 5px; border-radius: 50%; background: #9fe4b8; }
+  .ref-tip .s { font-size: 9.5px; color: rgba(255,255,255,.68); margin-top: 2px; }
+
+  .dock { position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 0 20px; z-index: 20;
+          background: linear-gradient(180deg, transparent, rgba(0,0,0,.7) 46%, rgba(0,0,0,.92)); }
+  .chips { display: flex; justify-content: center; gap: 7px; margin-bottom: 13px; }
+  .chip { height: 29px; padding: 0 12px; border-radius: 15px; display: flex; align-items: center; font-size: 11px;
+          color: rgba(255,255,255,.72); background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.14);
+          cursor: pointer; user-select: none; }
+  .chip.on { background: rgba(255,255,255,.92); color: #1f2a1f; font-weight: 600; }
+  .dock-row { display: flex; align-items: center; justify-content: space-between; padding: 0 28px; }
+  .dock-btn { width: 55px; display: flex; flex-direction: column; align-items: center; gap: 4px; color: rgba(255,255,255,.62); font-size: 9.5px; }
+  .dock-btn .e { font-size: 20px; }
+  .shutter { width: 74px; height: 74px; border-radius: 50%; border: 3px solid rgba(255,255,255,.9);
+             display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform .12s ease; }
+  .shutter:active { transform: scale(.94); }
+  .shutter i { display: block; width: 59px; height: 59px; border-radius: 50%; background: #fff; }
+
+  /* 拍照后的对比 */
+  .confirm { position: absolute; inset: 0; background: #0e120e; display: none; flex-direction: column; z-index: 50; }
+  .confirm.on { display: flex; }
+  .cf-head { display: flex; align-items: center; justify-content: space-between; padding: 52px 14px 8px; }
+  .cf-title { color: #fff; font-size: 14px; font-weight: 600; }
+  .cf-cmp { height: 31px; padding: 0 11px; border-radius: 16px; background: rgba(255,255,255,.14);
+            color: rgba(255,255,255,.82); font-size: 10.5px; display: flex; align-items: center; }
+  .cf-stage { position: relative; flex: 1; margin: 0 12px; border-radius: 16px; overflow: hidden; background: #000; }
+  .cf-a { position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at 48% 44%, rgba(150,235,220,.55), transparent 44%),
+      linear-gradient(160deg, #1f7a77 0%, #0f4a48 60%, #06262a 100%); }
+  .cf-b { position: absolute; inset: 0; clip-path: inset(0 50% 0 0);
+    background:
+      radial-gradient(circle at 54% 46%, rgba(170,245,230,.6), transparent 44%),
+      linear-gradient(160deg, #238682 0%, #12544f 60%, #082d2f 100%); }
+  .cf-a .f, .cf-b .f { position: absolute; font-size: 88px; filter: drop-shadow(0 10px 20px rgba(0,0,0,.45)); }
+  .cf-a .f { left: 50%; top: 44%; transform: translate(-50%,-50%); }
+  .cf-b .f { left: 54%; top: 46%; transform: translate(-50%,-50%); font-size: 96px; }
+  .cf-handle { position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; background: rgba(255,255,255,.9); }
+  .cf-knob { position: absolute; left: 50%; top: 50%; width: 34px; height: 34px; margin: -17px 0 0 -17px; border-radius: 50%;
+             background: #fff; display: flex; align-items: center; justify-content: center; color: #232a22; font-size: 12px; }
+  .cf-tag { position: absolute; top: 10px; padding: 3px 8px; border-radius: 5px; font-size: 9.5px; color: #fff; background: rgba(0,0,0,.45); }
+  .cf-tag.l { left: 10px; }
+  .cf-tag.r { right: 10px; }
+  .cf-body { padding: 12px 16px 20px; }
+  .cf-input { height: 44px; border-radius: 12px; background: rgba(255,255,255,.1); color: #fff;
+              display: flex; align-items: center; padding: 0 14px; font-size: 13px; }
+  .cf-input span { color: rgba(255,255,255,.36); }
+  .cf-actions { display: flex; gap: 9px; margin-top: 10px; }
+  .cf-btn { flex: 1; height: 46px; border-radius: 23px; display: flex; align-items: center; justify-content: center;
+            font-size: 14px; font-weight: 600; background: rgba(255,255,255,.14); color: #fff; }
+  .cf-btn.primary { flex: 1.6; background: #fff; color: #1f2a1f; }
+
+  /* ================= 幻灯片 ================= */
+  .slide-stage { position: absolute; inset: 0; background: #000; overflow: hidden; }
+  .sl { position: absolute; inset: 0; }
+  .sl .fill { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+  .sl.zoom-in { animation: kenIn 16s linear both, fadeIn .9s ease both; }
+  .sl.zoom-out { animation: kenOut 16s linear both, fadeIn .9s ease both; }
+  .sl.out.zoom-in { animation: kenIn 16s linear both, fadeOut .9s ease both; }
+  .sl.out.zoom-out { animation: kenOut 16s linear both, fadeOut .9s ease both; }
+  @keyframes kenIn { from { transform: scale(1.02); } to { transform: scale(1.13); } }
+  @keyframes kenOut { from { transform: scale(1.13); } to { transform: scale(1.02); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+
+  .s-top { position: absolute; top: 0; left: 0; right: 0; z-index: 70; padding: 52px 14px 4px;
+           background: linear-gradient(180deg, rgba(0,0,0,.66), transparent); }
+  .s-row { display: flex; align-items: center; gap: 8px; padding-bottom: 9px; }
+  .s-close { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,.16);
+             display: flex; align-items: center; justify-content: center; color: #fff; font-size: 16px; }
+  .s-title { flex: 1; color: #fff; }
+  .s-title .t { font-size: 15px; font-weight: 600; }
+  .s-title .s { font-size: 10px; color: rgba(255,255,255,.6); }
+  .s-ai { display: flex; align-items: center; gap: 4px; height: 30px; padding: 0 10px; border-radius: 15px;
+          background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.2); color: rgba(255,255,255,.85);
+          font-size: 10.5px; font-weight: 700; cursor: pointer; }
+  .s-ai.on { background: rgba(127,211,160,.94); border-color: transparent; color: #10402c; }
+  .s-ai i { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,.6); }
+  .s-ai.on i { background: #16523a; animation: pulse 2s infinite; }
+  .s-prog { height: 2px; background: rgba(255,255,255,.18); border-radius: 1px; overflow: hidden; }
+  .s-prog i { display: block; height: 100%; background: rgba(255,255,255,.92); transition: width .45s cubic-bezier(.22,1,.36,1); }
+
+  .s-bottom { position: absolute; left: 0; right: 0; bottom: 0; z-index: 70; padding: 40px 22px 34px;
+              background: linear-gradient(180deg, transparent, rgba(0,0,0,.72) 58%, rgba(0,0,0,.88)); color: #fff; }
+  .s-date { font-size: 28px; font-weight: 700; letter-spacing: 1px; }
+  .s-year { font-size: 11px; color: rgba(255,255,255,.55); }
+  .s-drow { display: flex; align-items: center; gap: 8px; margin-top: 3px; }
+  .s-day { font-size: 12px; color: #9fe4b8; font-weight: 600; }
+  .s-gap { font-size: 10.5px; color: rgba(255,255,255,.45); }
+  .s-note { margin-top: 7px; font-size: 12.5px; color: rgba(255,255,255,.86); }
+  .s-count { margin-top: 8px; font-size: 10.5px; color: rgba(255,255,255,.38); letter-spacing: 1px; }
+  .s-paused { position: absolute; left: 50%; top: 50%; width: 66px; height: 66px; margin: -33px 0 0 -33px;
+              border-radius: 50%; background: rgba(0,0,0,.42); backdrop-filter: blur(6px);
+              display: none; align-items: center; justify-content: center; z-index: 65; }
+  .s-paused.on { display: flex; }
+  .s-paused i { width: 0; height: 0; margin-left: 5px; border-left: 17px solid #fff;
+                border-top: 11px solid transparent; border-bottom: 11px solid transparent; }
+
+  /* ================= 养护 ================= */
+  .c-nav { display: flex; align-items: center; gap: 8px; padding: 52px 14px 6px; }
+  .c-title { flex: 1; text-align: center; }
+  .c-title .t { font-size: 15px; font-weight: 700; }
+  .c-title .s { font-size: 10px; color: var(--ink3); }
+  .c-tabs { display: flex; gap: 5px; margin: 10px 16px 0; padding: 4px; background: var(--bg-deep); border-radius: 13px; }
+  .c-tab { flex: 1; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 4px;
+           font-size: 13.5px; color: var(--ink2); cursor: pointer; }
+  .c-tab.on { background: #fff; color: var(--ink); font-weight: 700; box-shadow: 0 2px 7px rgba(46,58,44,.08); }
+  .c-tab .n { font-size: 10px; color: var(--ink3); }
+  .c-tab.on .n { color: var(--brand); }
+
+  .hint { display: flex; gap: 6px; margin: 14px 16px 0; padding: 11px 12px; border-radius: 11px;
+          background: var(--brand-soft); font-size: 11px; color: var(--brand-deep); line-height: 1.6; }
+  .m-list { padding: 10px 16px 0; }
+  .m-item { background: #fff; border-radius: 13px; margin-bottom: 8px; box-shadow: 0 4px 16px rgba(46,58,44,.06); overflow: hidden; }
+  .m-head { display: flex; align-items: center; gap: 8px; padding: 14px 13px; }
+  .m-idx { width: 20px; height: 20px; border-radius: 6px; background: var(--bg); color: var(--ink3);
+           font-size: 10px; display: flex; align-items: center; justify-content: center; }
+  .m-t { flex: 1; font-size: 14.5px; font-weight: 600; }
+  .m-a { width: 8px; height: 8px; border-right: 1.5px solid var(--ink3); border-bottom: 1.5px solid var(--ink3);
+         transform: rotate(45deg); margin-right: 4px; transition: transform .24s ease; }
+  .m-a.open { transform: rotate(-135deg); }
+  .m-b { padding: 0 13px 14px 41px; font-size: 12.5px; color: var(--ink2); line-height: 1.78; }
+  .m-op { display: inline-block; margin-top: 7px; font-size: 10.5px; color: var(--brand);
+          padding: 3px 9px; border-radius: 8px; background: var(--brand-soft); }
+
+  .cyc-card { margin: 14px 16px 0; background: #fff; border-radius: 14px; padding: 13px 11px 5px;
+              box-shadow: 0 4px 16px rgba(46,58,44,.06); }
+  .cyc-h { display: flex; align-items: baseline; justify-content: space-between; padding: 0 3px 9px; }
+  .cyc-h .t { font-size: 14.5px; font-weight: 700; }
+  .cyc-h .s { font-size: 10px; color: var(--ink3); }
+  .cyc-grid { display: flex; flex-wrap: wrap; }
+  .cyc { width: 33.33%; padding: 8px 0 11px; display: flex; flex-direction: column; align-items: center; gap: 2px; position: relative; }
+  .cyc .e { font-size: 19px; }
+  .cyc .n { font-size: 11px; font-weight: 500; }
+  .cyc .s { font-size: 9.5px; color: var(--ink3); }
+  .cyc.warn .s { color: var(--accent); font-weight: 600; }
+  .cyc.warn::after { content: ''; position: absolute; top: 7px; right: 29%; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .lg-date { display: flex; align-items: center; gap: 6px; padding: 6px 0 6px 2px; }
+  .lg-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--brand); }
+  .lg-dt { font-size: 12px; font-weight: 600; }
+  .lg-raw { font-size: 9px; color: var(--ink3); }
+  .lg-item { display: flex; align-items: flex-start; padding-bottom: 8px; position: relative; }
+  .lg-item::before { content: ''; position: absolute; left: 2px; top: 15px; bottom: -3px; width: 1px; background: var(--line); }
+  .lg-item:last-child::before { display: none; }
+  .lg-b { width: 6px; height: 6px; border-radius: 50%; margin: 11px 11px 0 0; flex-shrink: 0; }
+  .lg-card { flex: 1; background: #fff; border-radius: 10px; padding: 10px 12px; box-shadow: 0 2px 8px rgba(46,58,44,.05); }
+  .lg-row { display: flex; align-items: center; justify-content: space-between; }
+  .lg-type { font-size: 12.5px; font-weight: 600; }
+  .lg-time { font-size: 10px; color: var(--ink3); }
+  .lg-note { font-size: 11px; color: var(--ink2); margin-top: 3px; }
+
+  /* ---------------- 说明 ---------------- */
+  .notes { width: 320px; }
+  .note-card { background: #171b18; border: 1px solid #242a25; border-radius: 16px; padding: 20px 22px; margin-bottom: 14px; }
+  .note-card h3 { margin: 0 0 10px; font-size: 14px; font-weight: 700; color: #dfe6dc; letter-spacing: 1px; }
+  .note-card p { margin: 0 0 9px; font-size: 12.5px; line-height: 1.85; color: #8d968c; }
+  .note-card p:last-child { margin-bottom: 0; }
+  .note-card b { color: #b9d9c4; font-weight: 600; }
+  .kbd { display: inline-block; padding: 1px 6px; border-radius: 4px; background: #222824; color: #9fd3b1;
+         font-size: 11px; font-family: ui-monospace, monospace; }
+
+  /* ================= 识别 ================= */
+  .id-wrap {
+    height: 100%; display: flex; flex-direction: column;
+    background: #0e120e; color: #fff; padding: 0 16px 14px;
+  }
+  .id-top { display: flex; align-items: center; justify-content: space-between; padding-top: 50px; }
+  .id-last {
+    display: flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px;
+    border-radius: 16px; background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.1);
+    font-size: 12px; font-weight: 600;
+  }
+  .id-last .lbl { font-size: 10px; color: rgba(255,255,255,.42); font-weight: 400; }
+  .id-last .car { color: rgba(255,255,255,.5); }
+  .id-skip { font-size: 12px; color: rgba(255,255,255,.5); }
+  .id-head { padding: 14px 2px 10px; }
+  .id-head .t { font-size: 23px; font-weight: 700; letter-spacing: 1px; }
+  .id-head .s { font-size: 11.5px; color: rgba(255,255,255,.45); margin-top: 4px; }
+  .id-frame { position: relative; flex: 1; min-height: 186px; border-radius: 17px; overflow: hidden; background: #131813; }
+  .id-cam { position: absolute; inset: 0; background: radial-gradient(circle at 50% 42%, #2b4a42 0%, #16241f 55%, #080d0b 100%); }
+  .id-fish { position: absolute; left: 50%; top: 46%; transform: translate(-50%,-50%); font-size: 86px; filter: drop-shadow(0 10px 22px rgba(0,0,0,.5)); }
+  .fc { position: absolute; width: 22px; height: 22px; border: 1.5px solid rgba(255,255,255,.6); }
+  .fc.tl { left: 13px; top: 13px; border-right: none; border-bottom: none; border-radius: 5px 0 0 0; }
+  .fc.tr { right: 13px; top: 13px; border-left: none; border-bottom: none; border-radius: 0 5px 0 0; }
+  .fc.bl { left: 13px; bottom: 13px; border-right: none; border-top: none; border-radius: 0 0 0 5px; }
+  .fc.br { right: 13px; bottom: 13px; border-left: none; border-top: none; border-radius: 0 0 5px 0; }
+  .id-scan { position: absolute; inset: 0; background: rgba(6,12,8,.5); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+  .id-scan i {
+    position: absolute; left: 8%; right: 8%; height: 2px;
+    background: linear-gradient(90deg, transparent, #7fe0a8, transparent);
+    box-shadow: 0 0 12px rgba(127,224,168,.7);
+    animation: scanY 1.8s ease-in-out infinite;
+  }
+  @keyframes scanY { 0% { top: 18%; opacity: .2; } 50% { top: 78%; opacity: 1; } 100% { top: 18%; opacity: .2; } }
+  .id-scan span { font-size: 12px; color: #cfead9; letter-spacing: 1px; }
+
+  .id-result {
+    margin-top: 12px; padding: 13px 14px; border-radius: 15px;
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+  }
+  .ir-row { display: flex; align-items: center; gap: 10px; }
+  .ir-emoji { width: 44px; height: 44px; border-radius: 13px; background: rgba(255,255,255,.1); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  .ir-label { font-size: 11px; color: rgba(255,255,255,.5); }
+  .ir-name { font-size: 17px; font-weight: 700; margin-top: 1px; }
+  .ir-conf { font-size: 9.5px; color: #8fd8ac; margin-top: 2px; }
+  .ir-actions { display: flex; gap: 8px; margin-top: 11px; }
+  .ir-btn { flex: 1; height: 42px; border-radius: 21px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; background: rgba(255,255,255,.1); color: rgba(255,255,255,.85); }
+  .ir-btn.primary { flex: 1.7; background: #4e9e76; color: #fff; }
+
+  .id-picker { margin-top: 12px; }
+  .ip-head { display: flex; align-items: baseline; justify-content: space-between; padding: 0 4px 8px; font-size: 11.5px; color: rgba(255,255,255,.55); }
+  .ip-head .n { font-size: 9.5px; color: rgba(255,255,255,.28); }
+  .ip-rail { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+  .ip-rail::-webkit-scrollbar { display: none; }
+  .ip-card { width: 54px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 9.5px; color: rgba(255,255,255,.6); }
+  .ip-th { width: 54px; height: 54px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  .ip-new { border: 1px dashed rgba(255,255,255,.2); color: rgba(255,255,255,.4); }
+
+  /* ================= 漂流瓶 ================= */
+  .bt-nav { display: flex; align-items: center; gap: 8px; padding: 0 14px 6px; position: relative; }
+  .bt-back { width: 36px; height: 36px; border-radius: 50%; background: #fff; box-shadow: 0 2px 8px rgba(46,58,44,.07); display: flex; align-items: center; justify-content: center; }
+  .bt-title { flex: 1; text-align: center; font-size: 16px; font-weight: 700; letter-spacing: 1.5px; }
+  .bt-right { font-size: 11.5px; color: var(--brand); }
+  .bt-head { padding: 12px 18px 11px; position: relative; }
+  .bt-head .t { font-size: 21px; font-weight: 700; line-height: 1.35; }
+  .bt-head .s { font-size: 11px; color: var(--ink3); margin-top: 4px; }
+  .bt-card { margin: 0 16px; background: #fff; border-radius: 18px; overflow: hidden; box-shadow: 0 9px 24px rgba(46,58,44,.14); position: relative; }
+  .bt-cover { position: relative; height: 170px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .bt-emoji { font-size: 74px; filter: drop-shadow(0 6px 12px rgba(0,0,0,.14)); }
+  .bt-shade { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 58%, rgba(0,0,0,.3)); }
+  .bt-day { position: absolute; left: 13px; bottom: 12px; font-size: 11px; font-weight: 700; color: #fff; padding: 3px 9px; border-radius: 10px; background: rgba(0,0,0,.4); }
+  .bt-photos { position: absolute; right: 13px; bottom: 12px; font-size: 9.5px; color: rgba(255,255,255,.85); }
+  .bt-body { padding: 13px 15px 14px; }
+  .bt-name { font-size: 19px; font-weight: 700; }
+  .bt-meta { font-size: 11px; color: var(--ink3); margin-top: 3px; }
+  .bt-story { font-size: 12.5px; color: var(--ink2); line-height: 1.72; margin-top: 9px; }
+  .bt-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 11px; padding-top: 10px; border-top: 1px solid var(--line); }
+  .bt-stats { display: flex; gap: 13px; font-size: 11px; color: var(--ink2); }
+  .bt-more { font-size: 11px; color: var(--brand); font-weight: 600; }
+  .bt-pick {
+    margin: 14px 16px 0; height: 50px; border-radius: 25px;
+    background: linear-gradient(135deg, #2f8f8a, #3e7c5a); color: #fff;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    font-size: 15px; font-weight: 700; letter-spacing: 1px;
+    box-shadow: 0 7px 16px rgba(47,143,138,.3);
+  }
+  .bt-gate {
+    margin: 16px 16px 0; background: #fff; border-radius: 14px; padding: 18px 15px 16px;
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    box-shadow: 0 3px 10px rgba(46,58,44,.06);
+  }
+  .bg-ico { font-size: 27px; margin-bottom: 6px; }
+  .bg-title { font-size: 14px; font-weight: 700; }
+  .bg-desc { font-size: 10.5px; color: var(--ink3); line-height: 1.7; margin-top: 5px; }
+  .bg-btn { margin-top: 13px; height: 42px; padding: 0 36px; border-radius: 21px; background: var(--brand); color: #fff; font-size: 13px; font-weight: 600; display: flex; align-items: center; box-shadow: 0 5px 12px rgba(62,124,90,.26); }
+  .bt-mine { margin-top: 22px; }
+  .bt-mine .ip-card { color: var(--ink3); font-size: 10px; }
+  .bt-mine .ip-head { color: var(--ink2); }
+  .bt-mine .ip-head .n { color: var(--ink3); }
+
+  @media (max-width: 860px) {
+    body { padding: 20px 12px 50px; }
+    .stage { flex-direction: column; align-items: center; gap: 26px; }
+    .device { width: 340px; height: 736px; }
+    .notes { width: 100%; max-width: 375px; }
+  }
+</style>
+</head>
+<body>
+  <header>
+    <h1>春生夏长</h1>
+    <div class="sub">花 · 鸟 · 鱼 · 虫 的生长记录小程序 · 界面预览</div>
+  </header>
+
+  <div class="tabs">
+    <button class="on" data-page="home">主页</button>
+    <button data-page="identify">识别</button>
+    <button data-page="detail">记录详情</button>
+    <button data-page="capture">拍照</button>
+    <button data-page="slide">幻灯片</button>
+    <button data-page="care">养护</button>
+    <button data-page="bottle">漂流瓶</button>
+  </div>
+
+  <div class="stage">
+    <div class="device">
+      <div class="notch"></div>
+      <div class="screen">
+
+        <!-- ================= 主页 ================= -->
+        <section class="page active" id="p-home">
+          <div class="scroll">
+          <div class="glow g1"></div>
+          <div class="glow g2"></div>
+
+          <div class="topbar">
+            <div>
+              <div class="brand">春生夏长</div>
+              <div class="brand-en">GROWTH DIARY</div>
+            </div>
+            <div class="setbtn"><i></i><i></i><i></i></div>
+          </div>
+
+          <div class="subline">
+            <span class="greeting">晚上好</span>
+            <span class="today">10 月 22 日 · 周四</span>
+          </div>
+
+          <div class="hero">
+            <div class="hero-photo"></div>
+            <div class="hero-fish">🐟</div>
+            <div class="hero-shade"></div>
+            <div class="hero-body">
+              <div class="hero-row">
+                <span class="hero-tag">继续观察</span>
+                <span class="hero-day mono">第 31 天</span>
+              </div>
+              <div class="hero-name">🐟 雷龙</div>
+              <div class="hero-meta">七彩雷龙 · 已拍 28 张</div>
+              <div class="hero-foot">
+                <div class="hero-last"><i class="pulse"></i><span>昨天</span></div>
+                <div class="shoot"><i class="shoot-ico"></i><span>拍一张</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-head">
+            <span class="section-title">我的记录</span>
+            <span class="section-sub">4 项 · 96 张</span>
+          </div>
+
+          <div class="group-head">
+            <div class="group-left">
+              <i class="cat-bar" style="background:#1BA096"></i>
+              <span class="group-name">🐟 鱼</span>
+              <span class="group-hint">雷龙 · 斗鱼 · 锦鲤</span>
+            </div>
+            <div class="group-add">＋</div>
+          </div>
+          <div class="rail">
+            <div class="rec">
+              <div class="rec-thumb" style="background:linear-gradient(150deg,#1d7d7a,#06262a)">
+                <span class="big">🐟</span>
+                <span class="rec-count">28张</span>
+              </div>
+              <div class="rec-name">雷龙</div>
+              <div class="rec-sub">第 31 天</div>
+            </div>
+            <div class="rec">
+              <div class="rec-thumb" style="background:linear-gradient(150deg,#2e8f86,#0b3b3a)">
+                <span class="big">🐠</span>
+                <span class="rec-badge">今日</span>
+              </div>
+              <div class="rec-name">斗鱼</div>
+              <div class="rec-sub">第 12 天</div>
+            </div>
+            <div class="rec">
+              <div class="rec-new-box">＋</div>
+              <div class="rec-name">添加</div>
+              <div class="rec-sub">新鱼</div>
+            </div>
+          </div>
+
+          <div class="group-head">
+            <div class="group-left">
+              <i class="cat-bar" style="background:#DE6A8C"></i>
+              <span class="group-name">🌸 花</span>
+              <span class="group-hint">多肉 · 观叶 · 观花</span>
+            </div>
+            <div class="group-add">＋</div>
+          </div>
+          <div class="rail">
+            <div class="rec">
+              <div class="rec-thumb" style="background:linear-gradient(150deg,#e8f1e3,#b9d3b3)">
+                <span class="big">🪴</span>
+                <span class="rec-count">34张</span>
+              </div>
+              <div class="rec-name">龟背竹</div>
+              <div class="rec-sub">第 68 天</div>
+            </div>
+            <div class="rec">
+              <div class="rec-thumb" style="background:linear-gradient(150deg,#f6e6ec,#e2b9c8)">
+                <span class="big">🌷</span>
+              </div>
+              <div class="rec-name">郁金香</div>
+              <div class="rec-sub">第 9 天</div>
+            </div>
+            <div class="rec">
+              <div class="rec-new-box">＋</div>
+              <div class="rec-name">添加</div>
+              <div class="rec-sub">新花</div>
+            </div>
+          </div>
+
+          <div class="group-head">
+            <div class="group-left">
+              <i class="cat-bar" style="background:#3F86D4"></i>
+              <span class="group-name">🐦 鸟</span>
+              <span class="group-hint">鹦鹉 · 文鸟 · 雀类</span>
+            </div>
+            <div class="group-add">＋</div>
+          </div>
+          <div class="rail">
+            <div class="rec">
+              <div class="rec-thumb" style="background:linear-gradient(150deg,#eaf1fb,#b7cde8)">
+                <span class="big">🦜</span>
+                <span class="rec-count">21张</span>
+              </div>
+              <div class="rec-name">玄凤</div>
+              <div class="rec-sub">第 45 天</div>
+            </div>
+            <div class="rec">
+              <div class="rec-new-box">＋</div>
+              <div class="rec-name">添加</div>
+              <div class="rec-sub">新鸟</div>
+            </div>
+          </div>
+
+          <div class="group-head">
+            <div class="group-left">
+              <i class="cat-bar" style="background:#8878D6"></i>
+              <span class="group-name">🦗 虫</span>
+              <span class="group-hint">甲虫 · 螳螂 · 蜘蛛</span>
+            </div>
+            <div class="group-add">＋</div>
+          </div>
+          <div class="rail">
+            <div class="rec">
+              <div class="rec-thumb" style="background:linear-gradient(150deg,#f1eefc,#c6bceb)">
+                <span class="big">🪲</span>
+                <span class="rec-count">13张</span>
+              </div>
+              <div class="rec-name">独角仙</div>
+              <div class="rec-sub">第 22 天</div>
+            </div>
+            <div class="rec">
+              <div class="rec-new-box">＋</div>
+              <div class="rec-name">添加</div>
+              <div class="rec-sub">新虫</div>
+            </div>
+          </div>
+
+          <div class="footer-tip">每天同一角度拍一张，时间会替你把变化连起来</div>
+          <div style="height:80px"></div>
+          </div>
+
+          <div class="tabbar">
+            <div class="tab on"><i class="leaf"></i><span>记录</span></div>
+            <div class="tab"><i class="film"></i><span>影集</span></div>
+            <div class="tab"><i class="user-ico"></i><span>我的</span></div>
+          </div>
+        </section>
+
+        <!-- ================= 详情 ================= -->
+        <section class="page" id="p-detail">
+          <div class="scroll">
+          <div class="d-hero">
+            <div class="fish-big">🐟</div>
+            <div class="d-grad"></div>
+            <div class="back"><i class="chev"></i></div>
+            <div class="d-info">
+              <div class="avatar">🐟</div>
+              <div>
+                <div class="d-name">雷龙</div>
+                <div class="d-sub">七彩雷龙 · 第 31 天</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="stats">
+            <div class="stat"><span class="stat-num mono">31</span><span class="stat-label">总天数</span></div>
+            <i class="stat-line"></i>
+            <div class="stat"><span class="stat-num mono">28</span><span class="stat-label">张照片</span></div>
+            <i class="stat-line"></i>
+            <div class="stat"><span class="stat-num mono" style="font-size:15px">昨天</span><span class="stat-label">上次拍摄</span></div>
+          </div>
+
+          <div class="actions">
+            <div class="action">
+              <div class="action-ico">📖</div>
+              <div class="action-name">养护手册</div>
+              <div class="action-desc">5 条要点</div>
+            </div>
+            <div class="action">
+              <div class="action-ico">🗂️</div>
+              <div class="action-name">养护记录</div>
+              <div class="action-desc">42 次打卡</div>
+            </div>
+            <div class="action">
+              <div class="action-ico">🎞️</div>
+              <div class="action-name">幻灯片</div>
+              <div class="action-desc">按时间播放</div>
+            </div>
+          </div>
+
+          <div class="tl-head">
+            <span class="tl-title">生长时间线</span>
+            <span class="tl-count">28 张 · 倒序</span>
+          </div>
+          <div class="tl" id="timeline"></div>
+          <div style="height:76px"></div>
+          </div>
+
+          <div class="bbar">
+            <div class="bbar-side"><span class="ico">📖</span><span class="tx">手册</span></div>
+            <div class="bbar-side"><span class="ico">🗂️</span><span class="tx">养护</span></div>
+            <div class="bbar-main">
+              <i class="bbar-ring"></i>
+              <span class="tx">拍一张</span>
+              <span class="sb">今天还没拍</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= 拍照 ================= -->
+        <section class="page" id="p-capture" style="overflow:hidden">
+          <div class="cam">
+            <!-- 上一次的照片：虚化浅色，作为对位底 -->
+            <div class="ref-layer" id="refLayer">
+              <div class="ref-fish" id="refFish">🐟</div>
+            </div>
+            <!-- 实时取景里的实物 -->
+            <div class="live-fish" id="liveFish">🐟</div>
+
+            <div class="grid-line gv" style="left:33.33%"></div>
+            <div class="grid-line gv" style="left:66.66%"></div>
+            <div class="grid-line gh" style="top:33.33%"></div>
+            <div class="grid-line gh" style="top:66.66%"></div>
+
+            <div class="corner c-tl"></div>
+            <div class="corner c-tr"></div>
+            <div class="corner c-bl"></div>
+            <div class="corner c-br"></div>
+          </div>
+
+          <div class="cam-top">
+            <div class="cam-btn">✕</div>
+            <div class="cam-title">
+              <div class="t">雷龙</div>
+              <div class="s">10/22 周四</div>
+            </div>
+            <div class="cam-btn">⚡</div>
+          </div>
+
+          <div class="ref-tip">
+            <div class="l"><i class="d"></i><span>参考底 · 第 30 天</span></div>
+            <div class="s">把画面里的实物对到虚影上，角度就一致了</div>
+          </div>
+
+          <div class="dock">
+            <div class="chips">
+              <div class="chip on" id="chipRef">参考底</div>
+              <div class="chip" id="chipOp">浓度 38%</div>
+              <div class="chip on">网格</div>
+            </div>
+            <div class="dock-row">
+              <div class="dock-btn"><span class="e">🖼️</span><span>相册</span></div>
+              <div class="shutter" id="shutter"><i></i></div>
+              <div class="dock-btn"><span class="e">🔄</span><span>翻转</span></div>
+            </div>
+          </div>
+
+          <!-- 拍完的对比 -->
+          <div class="confirm" id="confirm">
+            <div class="cf-head">
+              <div class="cam-btn">✕</div>
+              <div class="cf-title">看看这次</div>
+              <div class="cf-cmp">取消对比</div>
+            </div>
+            <div class="cf-stage">
+              <div class="cf-a"><span class="f">🐟</span></div>
+              <div class="cf-b" id="cfB"><span class="f">🐟</span></div>
+              <div class="cf-handle" id="cfHandle"><i class="cf-knob">⇄</i></div>
+              <div class="cf-tag l">上次 · 第 30 天</div>
+              <div class="cf-tag r">这次</div>
+            </div>
+            <div class="cf-body">
+              <div class="cf-input"><span>写一句今天的变化（可选）</span></div>
+              <div class="cf-actions">
+                <div class="cf-btn" id="retake">重拍</div>
+                <div class="cf-btn primary">记下今天</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= 幻灯片 ================= -->
+        <section class="page" id="p-slide" style="overflow:hidden">
+          <div class="slide-stage">
+            <div class="sl zoom-in" id="slA"><div class="fill"></div></div>
+            <div class="sl zoom-out" id="slB"><div class="fill"></div></div>
+
+            <div class="s-top">
+              <div class="s-row">
+                <div class="s-close">✕</div>
+                <div class="s-title">
+                  <div class="t">雷龙</div>
+                  <div class="s">七彩雷龙 · 第 31 天</div>
+                </div>
+                <div class="s-ai on" id="aiBtn"><i></i><span>AI</span></div>
+              </div>
+              <div class="s-prog"><i id="sProg" style="width:4%"></i></div>
+            </div>
+
+            <div class="s-bottom">
+              <div><span class="s-date" id="sDate">10 月 22 日</span></div>
+              <div class="s-drow">
+                <span class="s-day" id="sDay">第 31 天</span>
+                <span class="s-gap" id="sGap">距上一张 1 天</span>
+              </div>
+              <div class="s-note" id="sNote">「体侧的蓝点更密了」</div>
+              <div class="s-count mono" id="sCount">8 / 28</div>
+            </div>
+
+            <div class="s-paused" id="sPaused"><i></i></div>
+          </div>
+        </section>
+
+        <!-- ================= 养护 ================= -->
+        <section class="page" id="p-care">
+          <div class="scroll">
+          <div class="c-nav">
+            <div class="back" style="position:static"><i class="chev"></i></div>
+            <div class="c-title">
+              <div class="t">雷龙</div>
+              <div class="s">🐟 七彩雷龙</div>
+            </div>
+            <div style="width:36px"></div>
+          </div>
+
+          <div class="c-tabs">
+            <div class="c-tab on" data-tab="m">养护手册 <span class="n">5</span></div>
+            <div class="c-tab" data-tab="l">养护记录 <span class="n">42</span></div>
+          </div>
+
+          <div id="paneM">
+            <div class="hint"><span>📖</span><span>按「鱼」类整理的养护要点，随时可以改成你自己的节奏</span></div>
+            <div class="m-list">
+              <div class="m-item">
+                <div class="m-head"><i class="m-idx mono">1</i><span class="m-t">水质</span><i class="m-a open"></i></div>
+                <div class="m-b">氨与亚硝酸盐应长期为 0。每周换水 1/3，新水需除氯并调至同温。滤材用缸内老水轻洗，切勿用自来水冲，避免破坏硝化菌群。<div><span class="m-op">编辑这条</span></div></div>
+              </div>
+              <div class="m-item">
+                <div class="m-head"><i class="m-idx mono">2</i><span class="m-t">水温</span><i class="m-a"></i></div>
+              </div>
+              <div class="m-item">
+                <div class="m-head"><i class="m-idx mono">3</i><span class="m-t">喂食</span><i class="m-a"></i></div>
+              </div>
+              <div class="m-item">
+                <div class="m-head"><i class="m-idx mono">4</i><span class="m-t">防跳与造景</span><i class="m-a"></i></div>
+              </div>
+              <div class="m-item">
+                <div class="m-head"><i class="m-idx mono">5</i><span class="m-t">常见病症</span><i class="m-a"></i></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="paneL" style="display:none">
+            <div class="cyc-card">
+              <div class="cyc-h"><span class="t">今天该做什么</span><span class="s">点一下就打卡</span></div>
+              <div class="cyc-grid">
+                <div class="cyc warn"><span class="e">🍚</span><span class="n">喂食</span><span class="s">2 天前</span></div>
+                <div class="cyc"><span class="e">💧</span><span class="n">换水</span><span class="s">今天</span></div>
+                <div class="cyc warn"><span class="e">🧹</span><span class="n">清洁</span><span class="s">9 天前</span></div>
+                <div class="cyc"><span class="e">☀️</span><span class="n">光照</span><span class="s">今天</span></div>
+                <div class="cyc"><span class="e">💊</span><span class="n">用药</span><span class="s">还没记录</span></div>
+                <div class="cyc"><span class="e">📝</span><span class="n">其他</span><span class="s">3 天前</span></div>
+              </div>
+            </div>
+
+            <div class="tl-head" style="padding:18px 18px 6px">
+              <span class="tl-title">养护时间线</span>
+              <span class="tl-count">长按可删除</span>
+            </div>
+            <div class="pad">
+              <div class="lg-date"><i class="lg-dot"></i><span class="lg-dt">今天</span><span class="lg-raw mono">2026-10-22</span></div>
+              <div class="lg-item"><i class="lg-b" style="background:#3F86D4"></i>
+                <div class="lg-card"><div class="lg-row"><span class="lg-type">💧 换水/浇水</span><span class="lg-time mono">09:20</span></div>
+                <div class="lg-note">换了 1/3，加了除氯剂</div></div>
+              </div>
+              <div class="lg-item"><i class="lg-b" style="background:#D9A73D"></i>
+                <div class="lg-card"><div class="lg-row"><span class="lg-type">☀️ 光照/日照</span><span class="lg-time mono">08:05</span></div></div>
+              </div>
+              <div class="lg-date" style="margin-top:6px"><i class="lg-dot"></i><span class="lg-dt">昨天</span><span class="lg-raw mono">2026-10-21</span></div>
+              <div class="lg-item"><i class="lg-b" style="background:#D98A3D"></i>
+                <div class="lg-card"><div class="lg-row"><span class="lg-type">🍚 喂食</span><span class="lg-time mono">19:40</span></div>
+                <div class="lg-note">红虫 3 粒 + 虾肉一小块</div></div>
+              </div>
+              <div class="lg-item"><i class="lg-b" style="background:#7C8B72"></i>
+                <div class="lg-card"><div class="lg-row"><span class="lg-type">🧹 清洁</span><span class="lg-time mono">19:35</span></div></div>
+              </div>
+            </div>
+          </div>
+          <div style="height:30px"></div>
+          </div>
+        </section>
+
+        <!-- ================= 识别 ================= -->
+        <section class="page" id="p-identify">
+          <div class="id-wrap">
+            <div class="id-top">
+              <div class="id-last"><span class="lbl">继续</span><span>🐟 雷龙</span><span class="car">›</span></div>
+              <div class="id-skip">跳过</div>
+            </div>
+
+            <div class="id-head">
+              <div class="t">今天要记录谁？</div>
+              <div class="s">拍一张，我来认认它是什么</div>
+            </div>
+
+            <div class="id-frame">
+              <div class="id-cam"></div>
+              <div class="id-fish">🐟</div>
+              <div class="fc tl"></div><div class="fc tr"></div>
+              <div class="fc bl"></div><div class="fc br"></div>
+              <div class="id-scan"><i></i><span>正在辨认…</span></div>
+            </div>
+
+            <div class="id-result">
+              <div class="ir-row">
+                <div class="ir-emoji">🐟</div>
+                <div>
+                  <div class="ir-label">看起来是「鱼」</div>
+                  <div class="ir-name">七彩雷龙</div>
+                  <div class="ir-conf">可信度 86%</div>
+                </div>
+              </div>
+              <div class="ir-actions">
+                <div class="ir-btn primary">就用它，开始记录</div>
+                <div class="ir-btn">重拍</div>
+              </div>
+            </div>
+
+            <div class="id-picker">
+              <div class="ip-head"><span>我记录过的</span><span class="n">4 条</span></div>
+              <div class="ip-rail">
+                <div class="ip-card"><div class="ip-th" style="background:linear-gradient(150deg,#1d7d7a,#06262a)">🐟</div><span>雷龙</span></div>
+                <div class="ip-card"><div class="ip-th" style="background:linear-gradient(150deg,#e8f1e3,#b9d3b3)">🪴</div><span>龟背竹</span></div>
+                <div class="ip-card"><div class="ip-th" style="background:linear-gradient(150deg,#eaf1fb,#b7cde8)">🦜</div><span>玄凤</span></div>
+                <div class="ip-card"><div class="ip-th" style="background:linear-gradient(150deg,#f1eefc,#c6bceb)">🪲</div><span>独角仙</span></div>
+                <div class="ip-card"><div class="ip-th ip-new">＋</div><span>新建</span></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= 漂流瓶 ================= -->
+        <section class="page" id="p-bottle">
+          <div class="scroll">
+            <div class="glow g1"></div>
+            <div class="glow g2"></div>
+
+            <div class="bt-nav" style="padding-top:48px">
+              <div class="bt-back"><i class="chev"></i></div>
+              <div class="bt-title">漂流瓶</div>
+              <div class="bt-right">投一只</div>
+            </div>
+
+            <div class="bt-head">
+              <div class="t">海面上漂着别人的日子</div>
+              <div class="s">捞一只，看看别人养的东西长到第几天了</div>
+            </div>
+
+            <div class="bt-card">
+              <div class="bt-cover" style="background:linear-gradient(150deg,#eaf1fb 0%,#9fc3e8 100%)">
+                <div class="bt-emoji">🦜</div>
+                <div class="bt-shade"></div>
+                <div class="bt-day mono">第 210 天</div>
+                <div class="bt-photos mono">156 张</div>
+              </div>
+              <div class="bt-body">
+                <div class="bt-name">🦜 玄凤</div>
+                <div class="bt-meta">玄凤鹦鹉 · 老陈</div>
+                <div class="bt-story">「换羽期掉了一地绒毛，现在冠羽长回来了，比之前更翘。」</div>
+                <div class="bt-foot">
+                  <div class="bt-stats"><span>♡ 62</span><span>◎ 27</span></div>
+                  <span class="bt-more">打开看看 ›</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="bt-pick">🌊 再捞一个</div>
+
+            <div class="bt-gate">
+              <div class="bg-ico">🔒</div>
+              <div class="bg-title">评论需要双方同意</div>
+              <div class="bg-desc">发出互动申请，对方通过后你们才能互相留言。点赞和订阅是单向的，不用等回应。</div>
+              <div class="bg-btn">申请互动</div>
+            </div>
+
+            <div class="bt-mine">
+              <div class="ip-head" style="padding-left:36px"><span>我投放的</span><span class="n">2 只</span></div>
+              <div class="ip-rail">
+                <div class="ip-card"><div class="ip-th" style="background:linear-gradient(150deg,#1d7d7a,#06262a)">🐟</div><span>雷龙</span></div>
+                <div class="ip-card"><div class="ip-th" style="background:linear-gradient(150deg,#e8f1e3,#b9d3b3)">🪴</div><span>龟背竹</span></div>
+              </div>
+            </div>
+
+            <div style="height:40px"></div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <aside class="notes">
+      <div class="note-card">
+        <h3>这一屏在做什么</h3>
+        <p id="noteText">
+          顶部「继续观察」永远是你最近看的那条记录，打开小程序就落在它上面。<b>花鸟鱼虫四类</b>在下面分组横滑，每条记录都有自己的 emoji 图标和「第 N 天」。
+        </p>
+      </div>
+      <div class="note-card">
+        <h3>可以点的东西</h3>
+        <p>顶部标签切换 5 个界面。在<b>拍照</b>页可以调参考底浓度、按快门看前后对比；在<b>幻灯片</b>页会自己播放，点 AI 可以切换过渡模式。</p>
+      </div>
+      <div class="note-card">
+        <h3>关于 AI 过渡</h3>
+        <p>本地过渡 = Ken Burns 缓慢推近 + 交叉溶解，<b>零成本、即时</b>。</p>
+        <p>AI 过渡 = 把相邻两张交给生成式模型合成中间帧，填上接口地址才启用，不填自动降级。骨架代码已留在 <span class="kbd">utils/transition.js</span>。</p>
+      </div>
+    </aside>
+  </div>
+
+<script>
+/* ---------------- 页面切换 ---------------- */
+const NOTES = {
+  home: '顶部「继续观察」永远是你最近看的那条记录。<b>花鸟鱼虫四类</b>在下面分组横滑，每条记录都有自己的 emoji 图标和「第 N 天」。',
+  identify: '开机第一屏：拍一张，<b>自动认出是花、鸟、鱼还是虫</b>，还能给出品种。认不出就往下走——<b>你记录过的生物排在下面</b>，点一下直接进去。右上角「跳过」回主页。',
+  detail: '一条记录的全部家当：大图、天数、照片数、上次拍摄。<b>养护手册 / 养护记录 / 幻灯片</b>是三个独立入口，底部固定「拍一张」，中间那条是投漂流瓶。',
+  capture: '取景框里那层<b>虚化浅色</b>的是上一次拍的照片——把实物对到虚影上，角度就一致了。手机倒着拿会自动转 180°，拍完还会多录两秒做成 <b>Live</b>。',
+  slide: '照片按时间顺序自动播放，两层交叉溶解 + Ken Burns。有 Live 片段的那几张，静图落定后会<b>轻轻动一下</b>。',
+  care: '手册和记录分开两个页签。<b>点一下图标就打卡</b>，超过建议周期的自动标橙提醒。',
+  bottle: '把养的东西做成瓶子放进海里。<b>默认不投</b>，点了才发。别人捞到能<b>点赞、订阅</b>；想留言得先发申请，<b>对方同意了才能互相评论</b>。'
+};
+
+document.querySelectorAll('.tabs button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    const key = btn.dataset.page;
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('p-' + key).classList.add('active');
+    document.getElementById('noteText').innerHTML = NOTES[key];
+    if (key === 'slide') startSlide();
+    if (key === 'capture') buildTimeline();
+  });
+});
+
+/* ---------------- 详情页时间线 ---------------- */
+const TL = [
+  ['linear-gradient(160deg,#1d7d7a,#06262a)', '🐟', '第 31 天'],
+  ['linear-gradient(160deg,#1a716f,#072a2c)', '🐟', '第 30 天'],
+  ['linear-gradient(160deg,#176866,#0a2e30)', '🐟', '第 28 天'],
+  ['linear-gradient(160deg,#1a716f,#082a2b)', '🐟', '第 24 天'],
+  ['linear-gradient(160deg,#155c5b,#0a3032)', '🐟', '第 20 天'],
+  ['linear-gradient(160deg,#17605f,#0b2c2e)', '🐟', '第 16 天'],
+  ['linear-gradient(160deg,#134f50,#0b2a2c)', '🐟', '第 11 天'],
+  ['linear-gradient(160deg,#114547,#0c282a)', '🐟', '第 6 天'],
+  ['linear-gradient(160deg,#0f3d40,#0d2628)', '🐟', '第 1 天']
+];
+function buildTimeline() {
+  const box = document.getElementById('timeline');
+  if (!box || box.dataset.done) return;
+  box.innerHTML = TL.map(([bg, e, d]) => `
+    <div class="tl-item" style="background:${bg}">
+      <div class="fill" style="font-size:26px">${e}</div>
+      <div class="tl-badge">${d}</div>
+    </div>`).join('');
+  box.dataset.done = '1';
+}
+buildTimeline();
+
+/* ---------------- 拍照页交互 ---------------- */
+const refLayer = document.getElementById('refLayer');
+const chipRef = document.getElementById('chipRef');
+const chipOp = document.getElementById('chipOp');
+const confirmBox = document.getElementById('confirm');
+const cfB = document.getElementById('cfB');
+const cfHandle = document.getElementById('cfHandle');
+
+let refOn = true;
+let opIndex = 1;
+const OPS = [22, 38, 55, 74];
+
+chipRef.addEventListener('click', () => {
+  refOn = !refOn;
+  chipRef.classList.toggle('on', refOn);
+  refLayer.style.display = refOn ? 'block' : 'none';
+});
+
+chipOp.addEventListener('click', () => {
+  opIndex = (opIndex + 1) % OPS.length;
+  const v = OPS[opIndex];
+  chipOp.textContent = '浓度 ' + v + '%';
+  refLayer.style.opacity = v / 100;
+});
+
+document.getElementById('shutter').addEventListener('click', () => {
+  confirmBox.classList.add('on');
+  splitPos = 50;
+  updateSplit();
+});
+
+document.getElementById('retake').addEventListener('click', () => {
+  confirmBox.classList.remove('on');
+});
+
+let splitPos = 50;
+function updateSplit() {
+  cfB.style.clipPath = `inset(0 ${100 - splitPos}% 0 0)`;
+  cfHandle.style.left = splitPos + '%';
+}
+let dragging = false;
+const stage = document.querySelector('.cf-stage');
+function posFromEvent(e) {
+  const r = stage.getBoundingClientRect();
+  const x = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
+  splitPos = Math.max(3, Math.min(97, (x / r.width) * 100));
+  updateSplit();
+}
+stage.addEventListener('mousedown', e => { dragging = true; posFromEvent(e); });
+window.addEventListener('mousemove', e => { if (dragging) posFromEvent(e); });
+window.addEventListener('mouseup', () => { dragging = false; });
+stage.addEventListener('touchstart', e => { dragging = true; posFromEvent(e); }, { passive: true });
+stage.addEventListener('touchmove', e => { if (dragging) posFromEvent(e); }, { passive: true });
+window.addEventListener('touchend', () => { dragging = false; });
+
+/* ---------------- 幻灯片 ---------------- */
+const FRAMES = [
+  { bg: 'linear-gradient(160deg,#0f3d40,#0d2628)', e: '🐟', size: 74, date: '9 月 22 日', day: '第 1 天', gap: '故事从这里开始', note: '刚到家，躲在造景后面' },
+  { bg: 'linear-gradient(160deg,#114547,#0c282a)', e: '🐟', size: 80, date: '9 月 27 日', day: '第 6 天', gap: '距上一张 5 天', note: '开始出来游动了' },
+  { bg: 'linear-gradient(160deg,#134f50,#0b2a2c)', e: '🐟', size: 86, date: '10 月 2 日', day: '第 11 天', gap: '距上一张 5 天', note: '' },
+  { bg: 'linear-gradient(160deg,#155c5b,#0a3032)', e: '🐟', size: 92, date: '10 月 7 日', day: '第 16 天', gap: '距上一张 5 天', note: '鳞片边缘开始发亮' },
+  { bg: 'linear-gradient(160deg,#17605f,#0b2c2e)', e: '🐟', size: 96, date: '10 月 11 日', day: '第 20 天', gap: '距上一张 4 天', note: '' },
+  { bg: 'linear-gradient(160deg,#1a716f,#082a2b)', e: '🐟', size: 100, date: '10 月 15 日', day: '第 24 天', gap: '距上一张 4 天', note: '体侧蓝点变密了' },
+  { bg: 'linear-gradient(160deg,#176866,#0a2e30)', e: '🐟', size: 104, date: '10 月 19 日', day: '第 28 天', gap: '距上一张 4 天', note: '' },
+  { bg: 'linear-gradient(160deg,#1d7d7a,#06262a)', e: '🐟', size: 110, date: '10 月 22 日', day: '第 31 天', gap: '距上一张 3 天', note: '比第一天大了一圈' }
+];
+
+let slideIdx = 0;
+let slideTimer = null;
+let slidePlaying = true;
+let curLayer = 'A';
+let dirA = 'zoom-in';
+let dirB = 'zoom-out';
+
+const slA = document.getElementById('slA');
+const slB = document.getElementById('slB');
+const sProg = document.getElementById('sProg');
+
+function paintLayer(el, f) {
+  el.innerHTML = `<div class="fill" style="background:${f.bg};font-size:${f.size}px">${f.e}</div>`;
+}
+
+function startSlide() {
+  if (slideTimer) return;
+  paintLayer(slA, FRAMES[slideIdx]);
+  slA.className = 'sl zoom-in';
+  dirA = 'zoom-in';
+  paintSlideInfo();
+  slideTimer = setInterval(() => { if (slidePlaying) advance(1); }, 3200);
+}
+
+function advance(step) {
+  slideIdx = (slideIdx + step + FRAMES.length) % FRAMES.length;
+  const nextIsB = curLayer === 'A';
+  const nextEl = nextIsB ? slB : slA;
+  const prevEl = nextIsB ? slA : slB;
+  const prevDir = nextIsB ? dirA : dirB;
+  const dir = slideIdx % 2 === 0 ? 'zoom-in' : 'zoom-out';
+
+  paintLayer(nextEl, FRAMES[slideIdx]);
+  nextEl.className = 'sl ' + dir;
+  prevEl.className = 'sl out ' + prevDir;
+
+  if (nextIsB) dirB = dir; else dirA = dir;
+  curLayer = nextIsB ? 'B' : 'A';
+  paintSlideInfo();
+}
+
+function paintSlideInfo() {
+  const f = FRAMES[slideIdx];
+  document.getElementById('sDate').textContent = f.date;
+  document.getElementById('sDay').textContent = f.day;
+  document.getElementById('sGap').textContent = f.gap;
+  document.getElementById('sNote').textContent = f.note ? '「' + f.note + '」' : '';
+  document.getElementById('sCount').textContent = (slideIdx + 1) + ' / ' + FRAMES.length;
+  sProg.style.width = ((slideIdx + 1) / FRAMES.length * 100) + '%';
+}
+
+/* 点击热区：左 26% 上一张，中间暂停，右 26% 下一张 */
+document.querySelector('#p-slide .slide-stage').addEventListener('click', e => {
+  if (e.target.closest('.s-top') || e.target.closest('.s-bottom') || e.target.closest('.ai-flash')) return;
+  const stage = e.currentTarget;
+  const r = stage.getBoundingClientRect();
+  const p = (e.clientX - r.left) / r.width;
+  if (p < 0.26) {
+    advance(-1);
+  } else if (p > 0.74) {
+    advance(1);
+  } else {
+    slidePlaying = !slidePlaying;
+    document.getElementById('sPaused').classList.toggle('on', !slidePlaying);
+  }
+});
+
+function tickForce() {
+  advance(1);
+}
+
+document.getElementById('aiBtn').addEventListener('click', () => {
+  const on = document.getElementById('aiBtn').classList.toggle('on');
+  const old = document.querySelector('.ai-flash');
+  if (old) old.remove();
+  const tip = document.createElement('div');
+  tip.className = 'ai-flash';
+  tip.style.cssText = 'position:absolute;left:50%;bottom:42%;transform:translateX(-50%);z-index:80;padding:7px 14px;border-radius:15px;background:rgba(20,26,20,.72);color:#fff;font-size:11px;white-space:nowrap';
+  tip.textContent = on ? 'AI 过渡：相邻两张之间插入生成式中间帧' : '已切回本地过渡：Ken Burns + 交叉溶解';
+  document.querySelector('#p-slide .slide-stage').appendChild(tip);
+  setTimeout(() => tip.remove(), 2200);
+});
+
+/* ---------------- 养护页签 ---------------- */
+document.querySelectorAll('.c-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.c-tab').forEach(t => t.classList.remove('on'));
+    tab.classList.add('on');
+    const m = tab.dataset.tab === 'm';
+    document.getElementById('paneM').style.display = m ? 'block' : 'none';
+    document.getElementById('paneL').style.display = m ? 'none' : 'block';
+  });
+});
+</script>
+</body>
+</html>

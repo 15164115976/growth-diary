@@ -1,0 +1,188 @@
+/* ==========================================================
+ * 春生夏长 · 全局样式
+ * 基调：暖纸底 + 苔绿主色 + 四类专属色调
+ * ========================================================== */
+
+page {
+  --bg: #f6f4ef;
+  --bg-deep: #efece4;
+  --card: #ffffff;
+  --ink: #232a22;
+  --ink-2: #5b6459;
+  --ink-3: #929a90;
+  --line: #e8e4da;
+  --brand: #3e7c5a;
+  --brand-deep: #2f6146;
+  --brand-soft: #e8f1eb;
+  --accent: #d97b3c;
+  --accent-soft: #fbeee3;
+  --danger: #c7574e;
+  --radius: 28rpx;
+  --radius-lg: 40rpx;
+  --shadow: 0 8rpx 32rpx rgba(46, 58, 44, 0.07);
+  --shadow-lift: 0 16rpx 48rpx rgba(46, 58, 44, 0.12);
+
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', 'Source Han Sans SC',
+    'Noto Sans SC', sans-serif;
+  font-size: 28rpx;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+view,
+text,
+image,
+scroll-view {
+  box-sizing: border-box;
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ---------------- 自定义导航 ---------------- */
+.nav {
+  position: relative;
+  z-index: 20;
+}
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 88rpx;
+  padding: 0 32rpx;
+}
+
+.nav-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  letter-spacing: 1rpx;
+}
+
+/* ---------------- 通用容器 ---------------- */
+.page {
+  min-height: 100vh;
+  padding-bottom: 40rpx;
+}
+
+.px {
+  padding-left: 32rpx;
+  padding-right: 32rpx;
+}
+
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.muted {
+  color: var(--ink-3);
+}
+
+.small {
+  font-size: 24rpx;
+}
+
+.mono {
+  font-family: 'SF Mono', 'DIN Alternate', Menlo, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.hairline {
+  height: 1rpx;
+  background: var(--line);
+}
+
+/* ---------------- 按钮 ---------------- */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 92rpx;
+  border-radius: 46rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  transition: transform 0.16s ease, opacity 0.16s ease;
+}
+
+.btn:active {
+  transform: scale(0.975);
+  opacity: 0.9;
+}
+
+.btn-primary {
+  background: var(--brand);
+  color: #fff;
+  box-shadow: 0 10rpx 28rpx rgba(62, 124, 90, 0.28);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--brand);
+  border: 2rpx solid rgba(62, 124, 90, 0.28);
+}
+
+.btn-plain {
+  background: var(--bg-deep);
+  color: var(--ink-2);
+}
+
+/* ---------------- 标签 ---------------- */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  height: 48rpx;
+  padding: 0 20rpx;
+  border-radius: 24rpx;
+  font-size: 23rpx;
+  line-height: 1;
+}
+
+/* ---------------- 空状态 ---------------- */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80rpx 40rpx;
+  text-align: center;
+  color: var(--ink-3);
+}
+
+.empty-emoji {
+  font-size: 68rpx;
+  opacity: 0.5;
+  margin-bottom: 20rpx;
+}
+
+/* ---------------- 动效 ---------------- */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-up {
+  animation: fadeUp 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.14);
+    opacity: 0.85;
+  }
+}

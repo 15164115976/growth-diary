@@ -1,0 +1,164 @@
+<!-- ================= 取景 ================= -->
+<view class="stage" wx:if="{{mode === 'view'}}">
+  <!-- 整块取景内容跟随重力旋转，UI 控件不跟着转 -->
+  <view class="viewport" style="transform:rotate({{flip}}deg)">
+    <camera
+      wx:if="{{!camError}}"
+      class="cam"
+      device-position="{{device}}"
+      flash="{{flash}}"
+      resolution="high"
+      frame-size="large"
+      bindinitdone="onCamInit"
+      binderror="onCamError"
+    ></camera>
+
+    <view class="cam-fallback" wx:else>
+      <text class="fb-ico">📷</text>
+      <text class="fb-title">{{camError}}</text>
+      <text class="fb-sub">请在设置中允许使用摄像头，或直接从相册选一张</text>
+      <view class="fb-btn" bindtap="openSetting">去设置</view>
+      <view class="fb-btn ghost" bindtap="pickFromAlbum">从相册选</view>
+    </view>
+
+    <!-- 上一次的照片：虚化浅色叠加，作为对位底 -->
+    <image
+      wx:if="{{refPhoto && showRef}}"
+      class="ref"
+      src="{{refPhoto.path}}"
+      mode="aspectFill"
+      style="opacity:{{refOpacity / 100}}"
+    ></image>
+
+    <!-- 三分线 -->
+    <view class="grid" wx:if="{{showGrid}}">
+      <view class="gv gv1"></view>
+      <view class="gv gv2"></view>
+      <view class="gh gh1"></view>
+      <view class="gh gh2"></view>
+    </view>
+
+    <!-- 对位四角 -->
+    <view class="corners" wx:if="{{refPhoto && showRef}}">
+      <view class="corner tl"></view>
+      <view class="corner tr"></view>
+      <view class="corner bl"></view>
+      <view class="corner br"></view>
+    </view>
+  </view>
+
+  <!-- 录制动态片段 -->
+  <view class="rec-mask" wx:if="{{recording}}">
+    <view class="rec-dot"></view>
+    <text class="rec-text">正在记录动态</text>
+    <text class="rec-sub">保持不动，马上就好</text>
+  </view>
+
+  <!-- 顶部 -->
+  <view class="topbar" style="padding-top:{{safeTop}}px">
+    <view class="tb-btn" bindtap="close">
+      <view class="x"></view>
+    </view>
+    <view class="tb-info">
+      <text class="tb-title">{{record.name}}</text>
+      <text class="tb-sub">{{todayText}}</text>
+    </view>
+    <view class="tb-btn {{flash === 'on' ? 'on' : ''}}" bindtap="toggleFlash">
+      <text class="tb-emoji">⚡</text>
+    </view>
+  </view>
+
+  <!-- 参考提示 -->
+  <view class="ref-tip" wx:if="{{refPhoto && showRef}}">
+    <view class="ref-tip-line">
+      <view class="ref-dot"></view>
+      <text class="ref-tip-main">参考底 · {{refPhoto.dayLabel}}</text>
+    </view>
+    <text class="ref-tip-sub">把画面里的实物对到虚影上，角度就一致了</text>
+  </view>
+  <view class="ref-tip first" wx:if="{{!refPhoto}}">
+    <text class="ref-tip-main">这是第一张</text>
+    <text class="ref-tip-sub">之后每次拍摄都会把它虚化叠在取景框里，方便对齐</text>
+  </view>
+
+  <!-- 底部控制 -->
+  <view class="dock" style="padding-bottom:{{safeBottom + 20}}px">
+    <view class="dock-chips">
+      <view class="chip-btn {{showRef ? 'on' : ''}}" bindtap="toggleRef">参考底</view>
+      <view class="chip-btn" bindtap="cycleRefOpacity">浓度 {{refOpacity}}%</view>
+      <view class="chip-btn {{showGrid ? 'on' : ''}}" bindtap="toggleGrid">网格</view>
+      <view class="chip-btn {{liveOn ? 'on' : ''}}" bindtap="toggleLive">LIVE</view>
+    </view>
+    <view class="flip-hint" bindtap="manualFlip">
+      <view class="fh-dot {{flip === 180 ? 'on' : ''}}"></view>
+      <text class="fh-text">{{flip === 180 ? '画面已倒转' : '画面正向'}}</text>
+      <text class="fh-swap">手动切换</text>
+    </view>
+
+    <view class="dock-row">
+      <view class="dock-btn" bindtap="pickFromAlbum">
+        <text class="dock-ico">🖼️</text>
+        <text class="dock-label">相册</text>
+      </view>
+
+      <view class="shutter" bindtap="shoot">
+        <view class="shutter-in"></view>
+      </view>
+
+      <view class="dock-btn" bindtap="flipCamera">
+        <text class="dock-ico">🔄</text>
+        <text class="dock-label">翻转</text>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- ================= 确认 ================= -->
+<view class="confirm" wx:if="{{mode === 'confirm'}}">
+  <view class="cf-head" style="padding-top:{{safeTop}}px">
+    <view class="tb-btn" bindtap="retake">
+      <view class="x"></view>
+    </view>
+    <text class="cf-title">{{capturedFrom === 'camera' ? '看看这次' : '从相册选的这张'}}</text>
+    <view class="cf-cmp-btn {{comparing ? 'on' : ''}}" bindtap="toggleCompare" wx:if="{{refPhoto}}">
+      {{comparing ? '取消对比' : '对比上次'}}
+    </view>
+    <view class="cf-cmp-ph" wx:else></view>
+  </view>
+
+  <view class="cf-stage" id="cmp" bindtouchstart="onCmpStart" bindtouchmove="onCmpMove">
+    <image class="cf-img" src="{{captured}}" mode="aspectFill"></image>
+
+    <block wx:if="{{comparing && refPhoto}}">
+      <view class="cf-split" style="width:{{splitPos}}%">
+        <image class="cf-img cf-img-fixed" src="{{refPhoto.path}}" mode="aspectFill"></image>
+      </view>
+      <view class="cf-handle" style="left:{{splitPos}}%">
+        <view class="cf-knob">
+          <view class="knob-arrow l"></view>
+          <view class="knob-arrow r"></view>
+        </view>
+      </view>
+      <view class="cf-tag t-left">上次 · {{refPhoto.dayLabel}}</view>
+      <view class="cf-tag t-right">这次</view>
+    </block>
+  </view>
+
+  <view class="cf-body" style="padding-bottom:{{safeBottom + 20}}px">
+    <input
+      class="cf-input"
+      placeholder="写一句今天的变化（可选）"
+      placeholder-class="cf-ph"
+      value="{{note}}"
+      bindinput="onNoteInput"
+      maxlength="60"
+      confirm-type="done"
+    />
+    <view class="cf-actions">
+      <view class="cf-btn" bindtap="retake">重拍</view>
+      <view class="cf-btn primary {{saving ? 'disabled' : ''}}" bindtap="save">
+        {{saving ? '保存中…' : '记下今天'}}
+      </view>
+    </view>
+  </view>
+</view>

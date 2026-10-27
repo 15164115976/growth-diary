@@ -1,0 +1,211 @@
+<view class="page" wx:if="{{record}}">
+  <!-- 返回 + LIVE -->
+  <view class="hero-tools" style="top:{{safeTop + 4}}px">
+    <view class="back" bindtap="goBack">
+      <view class="chev"></view>
+    </view>
+    <view class="hero-live {{liveVideo ? 'on' : ''}}" wx:if="{{coverLive}}" bindtap="playCoverLive">
+      <view class="hl-dot"></view>
+      <text>LIVE</text>
+    </view>
+  </view>
+
+  <!-- 换封面 -->
+  <view class="cover-btn" style="top:{{safeTop + 4}}px" bindtap="changeCover">换封面</view>
+
+  <!-- 主视觉 -->
+  <view class="hero">
+    <image wx:if="{{record.coverPath}}" class="hero-img" src="{{record.coverPath}}" mode="aspectFill" />
+    <view wx:else class="hero-ph" style="background:linear-gradient(160deg,{{record.catSoft}} 0%,{{record.catColor}}30 100%)">
+      <text class="hero-ghost">{{record.emoji}}</text>
+    </view>
+    <view class="hero-grad"></view>
+
+    <view class="hero-info">
+      <view class="avatar" catchtap="openIconSheet">
+        <image wx:if="{{record.iconPath}}" class="avatar-img" src="{{record.iconPath}}" mode="aspectFill" />
+        <text wx:else class="avatar-emoji">{{record.emoji}}</text>
+        <view class="avatar-pen"></view>
+      </view>
+      <view class="hero-text">
+        <view class="hero-name">{{record.name}}</view>
+        <view class="hero-sub">{{record.species || record.catName}}{{record.species ? ' · ' : ''}}第 {{record.days}} 天</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 数据条 -->
+  <view class="stats">
+    <view class="stat">
+      <text class="stat-num mono">{{stats.days}}</text>
+      <text class="stat-label">总天数</text>
+    </view>
+    <view class="stat-line"></view>
+    <view class="stat">
+      <text class="stat-num mono">{{stats.photos}}</text>
+      <text class="stat-label">张照片</text>
+    </view>
+    <view class="stat-line"></view>
+    <view class="stat">
+      <text class="stat-num stat-text">{{stats.gap}}</text>
+      <text class="stat-label">上次拍摄</text>
+    </view>
+  </view>
+
+  <!-- 三个独立入口 -->
+  <view class="actions">
+    <view class="action" bindtap="goCare" data-tab="manual">
+      <view class="action-ico" style="background:{{record.catSoft}}">📖</view>
+      <view class="action-name">养护手册</view>
+      <view class="action-desc">{{record.manual.length}} 条要点</view>
+    </view>
+    <view class="action" bindtap="goCare" data-tab="log">
+      <view class="action-ico" style="background:{{record.catSoft}}">🗂️</view>
+      <view class="action-name">养护记录</view>
+      <view class="action-desc">{{record.careLogs.length}} 次打卡</view>
+    </view>
+    <view class="action" bindtap="goSlideshow">
+      <view class="action-ico" style="background:{{record.catSoft}}">🎞️</view>
+      <view class="action-name">幻灯片</view>
+      <view class="action-desc">按时间播放</view>
+    </view>
+  </view>
+
+  <!-- 漂流瓶 -->
+  <view class="drift-bar {{record.drift.bottleId ? 'is-in' : ''}}" bindtap="throwBottle">
+    <view class="drift-left">
+      <text class="drift-ico">{{record.drift.bottleId ? '🍾' : '🌊'}}</text>
+      <view class="drift-text">
+        <text class="drift-title">{{record.drift.bottleId ? '已放进海里' : '做成漂流瓶'}}</text>
+        <text class="drift-sub">
+          {{record.drift.bottleId ? '别人可以点赞和订阅它' : '默认不发出去，点了才会投'}}
+        </text>
+      </view>
+    </view>
+    <view class="pick-arrow"></view>
+  </view>
+
+  <!-- 时间线 -->
+  <view class="tl-head">
+    <view class="tl-title-wrap">
+      <text class="tl-title">生长时间线</text>
+      <text class="tl-count">{{record.photoCount}} 张 · 倒序</text>
+    </view>
+  </view>
+
+  <view class="tl" wx:if="{{timeline.length > 0}}">
+    <view
+      class="tl-item"
+      wx:for="{{timeline}}"
+      wx:key="id"
+      data-index="{{index}}"
+      bindtap="preview"
+      bindlongpress="photoMenu"
+    >
+      <image class="tl-img" src="{{item.path}}" mode="aspectFill" lazy-load />
+      <view class="tl-badge">{{item.dayLabel}}</view>
+      <view class="tl-live" wx:if="{{item.live}}">
+        <view class="tl-live-dot"></view>
+      </view>
+      <view class="tl-note" wx:if="{{item.note}}">{{item.note}}</view>
+    </view>
+  </view>
+
+  <view class="tl-empty" wx:else>
+    <text class="tl-empty-ico">📷</text>
+    <text class="tl-empty-title">还没有第一张照片</text>
+    <text class="tl-empty-sub">拍下今天的样子，时间线从第 1 天开始</text>
+    <view class="tl-empty-btn" bindtap="goCapture">拍第一张</view>
+  </view>
+
+  <view class="tl-tip" wx:if="{{timeline.length > 0}}">
+    <text>轻点看大图 · 长按可加备注或删除</text>
+  </view>
+
+  <view style="height:{{safeBottom + 190}}px"></view>
+
+  <!-- 底部操作栏 -->
+  <view class="bbar" style="padding-bottom:{{safeBottom}}px">
+    <view class="bbar-side" bindtap="goCare" data-tab="manual">
+      <text class="bbar-ico">📖</text>
+      <text class="bbar-text">手册</text>
+    </view>
+    <view class="bbar-side" bindtap="goCare" data-tab="log">
+      <text class="bbar-ico">🗂️</text>
+      <text class="bbar-text">养护</text>
+    </view>
+    <view class="bbar-main" bindtap="goCapture">
+      <view class="bbar-ring"></view>
+      <text class="bbar-main-text">拍一张</text>
+      <text class="bbar-main-sub" wx:if="{{record.shotToday}}">今天已记录</text>
+      <text class="bbar-main-sub" wx:else>今天还没拍</text>
+    </view>
+  </view>
+
+  <!-- Live 播放 -->
+  <view class="live-mask" wx:if="{{liveVideo}}" bindtap="closeLive">
+    <video
+      class="live-full"
+      src="{{liveVideo}}"
+      autoplay
+      muted
+      controls="{{false}}"
+      show-center-play-btn="{{false}}"
+      object-fit="contain"
+      bindended="closeLive"
+    ></video>
+    <view class="live-close">轻点关闭</view>
+  </view>
+
+  <!-- 投瓶弹层 -->
+  <view class="mask" wx:if="{{driftSheet}}" bindtap="closeDrift">
+    <view class="sheet" catchtap="noop">
+      <view class="sheet-bar"></view>
+      <view class="sheet-title">做成漂流瓶</view>
+      <view class="sheet-sub">会带上封面、名字、品种和「第 {{record.days}} 天」</view>
+      <textarea
+        class="drift-input"
+        placeholder="说一句为什么想让人看到它…"
+        placeholder-class="drift-ph"
+        value="{{driftStory}}"
+        bindinput="onDriftStory"
+        maxlength="200"
+      />
+      <view class="drift-privacy">
+        不会带你的任何联系方式。别人只能点赞和订阅；想留言得先发申请，你同意了才能互相评论。
+      </view>
+      <view class="sheet-actions">
+        <view class="sheet-btn" bindtap="closeDrift">取消</view>
+        <view class="sheet-btn primary" bindtap="confirmDrift">
+          {{driftBusy ? '投放中…' : '投进海里'}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 图标选择弹层 -->
+  <view class="mask" wx:if="{{iconSheet}}" bindtap="closeIconSheet">
+    <view class="sheet" catchtap="noop">
+      <view class="sheet-bar"></view>
+      <view class="sheet-title">给「{{record.name}}」换个图标</view>
+      <view class="sheet-sub">图标就是你在这个记录里的门牌</view>
+
+      <view class="emoji-grid">
+        <view
+          class="emoji-item {{record.emoji === item ? 'on' : ''}}"
+          wx:for="{{emojiList}}"
+          wx:key="*this"
+          data-e="{{item}}"
+          bindtap="pickEmoji"
+        >
+          <text class="emoji-txt">{{item}}</text>
+        </view>
+      </view>
+
+      <view class="sheet-actions">
+        <view class="sheet-btn" bindtap="pickIconImage">用照片当图标</view>
+        <view class="sheet-btn primary" bindtap="closeIconSheet">完成</view>
+      </view>
+    </view>
+  </view>
+</view>

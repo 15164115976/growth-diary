@@ -1,0 +1,140 @@
+.tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-start;
+  height: 108rpx;
+  padding-top: 12rpx;
+}
+
+.tabbar-bg {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.94);
+  border-top: 1rpx solid rgba(232, 228, 218, 0.9);
+  backdrop-filter: blur(20rpx);
+  -webkit-backdrop-filter: blur(20rpx);
+}
+
+.tab {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #9aa196;
+  transition: color 0.22s ease;
+}
+
+.tab.is-on {
+  color: #3e7c5a;
+}
+
+.tab-text {
+  font-size: 21rpx;
+  letter-spacing: 1rpx;
+  margin-top: 6rpx;
+  font-weight: 500;
+}
+
+.tab.is-on .tab-text {
+  font-weight: 600;
+}
+
+/* ---------- 图标：纯 CSS 绘制 ---------- */
+.ico {
+  position: relative;
+  width: 46rpx;
+  height: 44rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tab.is-on .ico {
+  transform: translateY(-2rpx);
+}
+
+.ico-c {
+  display: none;
+}
+
+/* 叶子 —— 记录 */
+.ico-leaf .ico-a {
+  width: 30rpx;
+  height: 30rpx;
+  border: 3rpx solid currentColor;
+  border-radius: 0 50% 0 50%;
+  transform: rotate(-45deg);
+  transition: background 0.22s ease;
+}
+
+.tab.is-on .ico-leaf .ico-a {
+  background: currentColor;
+  border-color: currentColor;
+}
+
+/* 叠片 —— 影集 */
+.ico-film .ico-a {
+  width: 34rpx;
+  height: 26rpx;
+  border: 3rpx solid currentColor;
+  border-radius: 7rpx;
+  position: relative;
+}
+
+.ico-film .ico-b {
+  position: absolute;
+  bottom: 5rpx;
+  left: 50%;
+  width: 14rpx;
+  height: 3rpx;
+  background: currentColor;
+  transform: translateX(-50%);
+  border-radius: 2rpx;
+}
+
+.tab.is-on .ico-film .ico-a {
+  background: currentColor;
+}
+
+.tab.is-on .ico-film .ico-b {
+  background: #fff;
+}
+
+/* 人形 —— 我的 */
+.ico-user .ico-a {
+  width: 15rpx;
+  height: 15rpx;
+  border: 3rpx solid currentColor;
+  border-radius: 50%;
+  margin-bottom: 4rpx;
+  transition: background 0.22s ease;
+}
+
+.ico-user .ico-b {
+  width: 30rpx;
+  height: 15rpx;
+  border: 3rpx solid currentColor;
+  border-bottom: none;
+  border-radius: 16rpx 16rpx 0 0;
+  transition: background 0.22s ease;
+}
+
+.tab.is-on .ico-user .ico-a {
+  background: currentColor;
+}
+
+.tab.is-on .ico-user .ico-b {
+  background: currentColor;
+}

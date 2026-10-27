@@ -1,0 +1,181 @@
+<view
+  class="stage"
+  bindtouchstart="onStageTouchStart"
+  bindtouchend="onStageTouchEnd"
+>
+  <!-- 画面层：横屏时整块转 90° -->
+  <view class="stage-inner {{landscape ? 'land' : ''}}">
+    <view class="slide" wx:for="{{layers}}" wx:key="k" style="z-index:{{item.z}}">
+      <image
+        wx:if="{{item.src}}"
+        class="slide-img {{item.out ? 'out' : ''}} {{item.dir === 'out' ? 'zoom-out' : 'zoom-in'}}"
+        src="{{item.src}}"
+        mode="aspectFill"
+      ></image>
+    </view>
+
+    <!-- Live 片段：按了 LIVE 才播 -->
+    <video
+      wx:if="{{liveVideo}}"
+      class="live-video"
+      src="{{liveVideo}}"
+      autoplay
+      muted
+      controls="{{false}}"
+      show-center-play-btn="{{false}}"
+      object-fit="cover"
+      bindended="onLiveEnd"
+    ></video>
+
+    <!-- AI 过渡 -->
+    <video
+      wx:if="{{aiVideo}}"
+      class="ai-video"
+      src="{{aiVideo}}"
+      autoplay
+      muted
+      controls="{{false}}"
+      show-center-play-btn="{{false}}"
+      object-fit="cover"
+      bindended="onAiVideoEnd"
+    ></video>
+  </view>
+
+  <!-- 点击热区：左上一张 / 中间暂停 / 右下一张 -->
+  <view class="hit hit-left" bindtap="prev"></view>
+  <view class="hit hit-mid" bindtap="togglePlay"></view>
+  <view class="hit hit-right" bindtap="next"></view>
+
+  <!-- 顶部 -->
+  <view class="top" style="padding-top:{{safeTop}}px">
+    <view class="top-row">
+      <view class="close" bindtap="close">
+        <view class="x"></view>
+      </view>
+      <view class="title-wrap">
+        <text class="title">{{record.name}}</text>
+        <text class="sub">{{record.species || record.catName}} · 第 {{record.days}} 天</text>
+      </view>
+      <view class="ai-btn {{aiMode ? 'on' : ''}}" bindtap="toggleAi">
+        <view class="ai-dot"></view>
+        <text class="ai-text">AI</text>
+      </view>
+    </view>
+
+    <view class="progress">
+      <view class="progress-bar" style="width:{{(index + 1) / total * 100}}%"></view>
+    </view>
+  </view>
+
+  <!-- 底部信息 -->
+  <view class="bottom" style="padding-bottom:{{safeBottom + 28}}px">
+    <view class="b-date-row">
+      <text class="b-date">{{current.date}}</text>
+      <text class="b-year">{{current.year}} · {{current.weekday}}</text>
+    </view>
+    <view class="b-day-row">
+      <text class="b-day">{{current.dayLabel}}</text>
+      <text class="b-gap">{{current.gap}}</text>
+      <view class="b-live-btn {{livePlaying ? 'on' : ''}}" wx:if="{{hasLive}}" catchtap="playLive">
+        <view class="b-live-dot"></view>
+        <text>{{livePlaying ? '播放中' : 'LIVE'}}</text>
+      </view>
+    </view>
+    <view class="b-note" wx:if="{{current.note}}">「{{current.note}}」</view>
+    <view class="b-count mono">{{current.seq}} / {{total}}</view>
+
+    <view class="swipe-tip">
+      <text class="st-up">↑ 拍摄日历</text>
+      <text class="st-sep">·</text>
+      <text class="st-down">↓ 养护记录</text>
+    </view>
+  </view>
+
+  <!-- AI 生成提示 -->
+  <view class="ai-hint" wx:if="{{aiHint}}">{{aiHint}}</view>
+
+  <!-- 暂停标识 -->
+  <view class="paused" wx:if="{{!playing && !calendarVisible && !careVisible}}">
+    <view class="play-tri"></view>
+  </view>
+
+  <!-- ================= 拍摄日历 ================= -->
+  <view class="panel-mask" wx:if="{{calendarVisible}}" bindtap="closeCalendar">
+    <view class="panel" catchtap="noop">
+      <view class="panel-bar"></view>
+      <view class="panel-head">
+        <text class="panel-title">拍摄日历</text>
+        <text class="panel-sub">{{total}} 张 · 点有圆点的日子跳过去</text>
+      </view>
+
+      <scroll-view scroll-y class="panel-body">
+        <view class="cal-month" wx:for="{{calendarMonths}}" wx:key="key" wx:for-item="m">
+          <view class="cal-head">
+            <text class="cal-label">{{m.label}}</text>
+            <text class="cal-count">{{m.total}} 天有记录</text>
+          </view>
+          <view class="cal-week">
+            <text class="cal-wd">日</text>
+            <text class="cal-wd">一</text>
+            <text class="cal-wd">二</text>
+            <text class="cal-wd">三</text>
+            <text class="cal-wd">四</text>
+            <text class="cal-wd">五</text>
+            <text class="cal-wd">六</text>
+          </view>
+          <view class="cal-grid">
+            <view
+              class="cal-cell {{c.empty ? 'empty' : ''}} {{c.has ? 'has' : ''}}"
+              wx:for="{{m.cells}}"
+              wx:key="key"
+              wx:for-item="c"
+              data-index="{{c.index}}"
+              bindtap="jumpToDate"
+            >
+              <text class="cal-day" wx:if="{{!c.empty}}">{{c.day}}</text>
+              <view class="cal-dot" wx:if="{{c.has}}"></view>
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+
+  <!-- ================= 养护记录与计划 ================= -->
+  <view class="panel-mask" wx:if="{{careVisible}}" bindtap="closeCare">
+    <view class="panel" catchtap="noop">
+      <view class="panel-bar"></view>
+      <view class="panel-head">
+        <text class="panel-title">养护计划</text>
+        <text class="panel-link" catchtap="goCare">去打卡 ›</text>
+      </view>
+
+      <scroll-view scroll-y class="panel-body">
+        <view class="care-item" wx:for="{{careItems}}" wx:key="key">
+          <text class="ci-ico">{{item.icon}}</text>
+          <view class="ci-body">
+            <text class="ci-name">{{item.name}}</text>
+            <text class="ci-amount" wx:if="{{item.amount}}">{{item.amount}}</text>
+          </view>
+          <text class="ci-every">每 {{item.every}} 天</text>
+        </view>
+        <view class="panel-empty" wx:if="{{careItems.length === 0}}">
+          还没设定养护计划，去养护页排一个
+        </view>
+
+        <view class="panel-sub-title">最近的养护</view>
+        <view class="care-log" wx:for="{{careRecent}}" wx:key="id">
+          <text class="cl-ico">{{item.icon}}</text>
+          <view class="cl-body">
+            <text class="cl-name">{{item.name}}</text>
+            <text class="cl-note" wx:if="{{item.note}}">{{item.note}}</text>
+          </view>
+          <text class="cl-time">{{item.time}}</text>
+        </view>
+        <view class="panel-empty" wx:if="{{careRecent.length === 0}}">
+          还没有打卡记录
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+</view>

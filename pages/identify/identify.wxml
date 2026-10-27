@@ -1,0 +1,136 @@
+<view class="page">
+  <view style="height:{{safeTop}}px"></view>
+
+  <!-- 顶部 -->
+  <view class="top">
+    <view class="last" wx:if="{{lastRecord}}" bindtap="openLast">
+      <text class="last-label">继续</text>
+      <text class="last-name">{{lastRecord.emoji}} {{lastRecord.name}}</text>
+      <view class="arrow-r"></view>
+    </view>
+    <view class="last-ph" wx:else></view>
+    <view class="skip" bindtap="goHome">跳过</view>
+  </view>
+
+  <!-- 标题 -->
+  <view class="head">
+    <view class="title">今天要记录谁？</view>
+    <view class="sub">{{recognizeOn ? '拍一张，我来认认它是什么' : recognizeHint}}</view>
+  </view>
+
+  <!-- 取景框 -->
+  <view class="frame">
+    <camera
+      wx:if="{{!shot}}"
+      class="cam"
+      style="transform:rotate({{flip}}deg)"
+      device-position="back"
+      flash="off"
+      resolution="high"
+      bindinitdone="onCamInit"
+      binderror="onCamError"
+    ></camera>
+    <image wx:else class="shot" src="{{shot}}" mode="aspectFill"></image>
+
+    <view class="fc tl"></view>
+    <view class="fc tr"></view>
+    <view class="fc bl"></view>
+    <view class="fc br"></view>
+
+    <view class="cam-err" wx:if="{{camError && !shot}}">
+      <text class="ce-text">{{camError}}</text>
+      <view class="ce-btn" bindtap="openSetting">去设置</view>
+    </view>
+
+    <view class="scanning" wx:if="{{mode === 'scanning'}}">
+      <view class="scan-line"></view>
+      <text class="scan-text">正在辨认…</text>
+    </view>
+  </view>
+
+  <!-- 结果 -->
+  <view class="result" wx:if="{{mode === 'result'}}">
+    <block wx:if="{{!failed}}">
+      <view class="r-row">
+        <view class="r-emoji">{{result.emoji}}</view>
+        <view class="r-info">
+          <view class="r-label">看起来是「{{result.catName}}」</view>
+          <view class="r-name">{{result.species || result.name || '没认出具体品种'}}</view>
+          <view class="r-conf" wx:if="{{result.confPct}}">
+            可信度 {{result.confPct}}%
+          </view>
+        </view>
+      </view>
+      <view class="r-match" wx:if="{{matched}}">
+        你已经记录过「{{matched.name}}」，今天是第 {{matched.days}} 天
+      </view>
+      <view class="r-actions">
+        <view class="r-btn primary" bindtap="useResult">
+          {{matched ? '打开这条' : '就用它，开始记录'}}
+        </view>
+        <view class="r-btn" bindtap="retry">重拍</view>
+      </view>
+    </block>
+
+    <block wx:else>
+      <view class="r-row">
+        <view class="r-emoji">🤔</view>
+        <view class="r-info">
+          <view class="r-label">没认出来是什么</view>
+          <view class="r-name">从你记录过的里选一条，或者新建一条</view>
+        </view>
+      </view>
+      <view class="r-actions">
+        <view class="r-btn primary" bindtap="createManual">新建一条</view>
+        <view class="r-btn" bindtap="retry">重拍</view>
+      </view>
+    </block>
+  </view>
+
+  <!-- 未出结果时的快门区 -->
+  <view class="dock" wx:if="{{mode !== 'result'}}">
+    <view class="dock-btn" bindtap="pickFromAlbum">
+      <text class="db-ico">🖼️</text>
+      <text class="db-tx">相册</text>
+    </view>
+    <view class="shutter {{mode === 'scanning' ? 'busy' : ''}}" bindtap="shoot">
+      <view class="shutter-in"></view>
+    </view>
+    <view class="dock-btn" bindtap="goHome">
+      <text class="db-ico">🏠</text>
+      <text class="db-tx">主页</text>
+    </view>
+  </view>
+
+  <!-- 我记录过的 -->
+  <view class="picker">
+    <view class="picker-head">
+      <text class="picker-title">我记录过的</text>
+      <text class="picker-count">{{records.length}} 条</text>
+    </view>
+    <scroll-view class="rail" scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="rail-inner">
+        <view
+          class="pcard"
+          wx:for="{{records}}"
+          wx:key="id"
+          data-id="{{item.id}}"
+          bindtap="pickExisting"
+        >
+          <view class="pthumb" style="background:{{item.catSoft}}">
+            <image wx:if="{{item.cover}}" class="pimg" src="{{item.cover}}" mode="aspectFill" />
+            <text wx:else class="pemoji">{{item.emoji}}</text>
+          </view>
+          <text class="pname">{{item.name}}</text>
+        </view>
+
+        <view class="pcard" bindtap="createManual">
+          <view class="pthumb pnew">＋</view>
+          <text class="pname">新建</text>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view style="height:{{safeBottom + 12}}px"></view>
+</view>

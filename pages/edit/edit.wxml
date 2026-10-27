@@ -1,0 +1,121 @@
+<view class="page">
+  <view style="height:{{safeTop}}px"></view>
+
+  <view class="nav">
+    <view class="back" bindtap="goBack">
+      <view class="chev"></view>
+    </view>
+    <text class="nav-title">{{isNew ? '新的一条记录' : '编辑记录'}}</text>
+    <view class="nav-save" bindtap="save">{{isNew ? '创建' : '保存'}}</view>
+  </view>
+
+  <!-- 预览 -->
+  <view class="preview">
+    <view class="pv-icon" bindtap="pickIcon" style="background:{{emojiList.length ? '#fff' : '#fff'}}">
+      <image wx:if="{{iconPath}}" class="pv-img" src="{{iconPath}}" mode="aspectFill" />
+      <text wx:else class="pv-emoji">{{emoji}}</text>
+      <view class="pv-badge">换</view>
+    </view>
+    <view class="pv-text">
+      <view class="pv-name">{{name || '还没起名字'}}</view>
+      <view class="pv-sub">{{species || '品种 · 可留空'}}</view>
+    </view>
+  </view>
+
+  <!-- 分类 -->
+  <view class="field">
+    <view class="label">属于哪一类</view>
+    <view class="cats">
+      <view
+        class="cat {{categoryKey === item.key ? 'on' : ''}}"
+        wx:for="{{categories}}"
+        wx:key="key"
+        data-key="{{item.key}}"
+        bindtap="pickCategory"
+        style="{{categoryKey === item.key ? 'border-color:' + item.color + ';background:' + item.soft : ''}}"
+      >
+        <text class="cat-ico">{{item.icon}}</text>
+        <text class="cat-name">{{item.name}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 图标 -->
+  <view class="field">
+    <view class="label">图标</view>
+    <view class="label-sub">选一个 emoji，或者用照片当图标</view>
+    <view class="emojis">
+      <view
+        class="em {{emoji === item && !iconPath ? 'on' : ''}}"
+        wx:for="{{emojiList}}"
+        wx:key="*this"
+        data-e="{{item}}"
+        bindtap="pickEmoji"
+      >
+        <text class="em-txt">{{item}}</text>
+      </view>
+      <view class="em em-photo" bindtap="pickIcon">
+        <text class="em-txt">＋</text>
+      </view>
+    </view>
+    <view class="clear-icon" wx:if="{{iconPath}}" bindtap="clearIcon">不用照片，改回 emoji</view>
+  </view>
+
+  <!-- 名字 -->
+  <view class="field">
+    <view class="label">名字</view>
+    <input
+      class="input"
+      placeholder="比如「雷龙」「小绿」「豆豆」"
+      placeholder-class="ph"
+      value="{{name}}"
+      bindinput="onName"
+      maxlength="16"
+    />
+  </view>
+
+  <!-- 品种 -->
+  <view class="field">
+    <view class="label">品种 / 学名</view>
+    <input
+      class="input"
+      placeholder="比如「七彩雷龙」「龟背竹」"
+      placeholder-class="ph"
+      value="{{species}}"
+      bindinput="onSpecies"
+      maxlength="24"
+    />
+  </view>
+
+  <!-- 开始日期 -->
+  <view class="field">
+    <view class="label">从哪天开始算</view>
+    <picker mode="date" value="{{startDate}}" bindchange="onDate">
+      <view class="picker-row">
+        <text class="picker-val mono">{{startDate}}</text>
+        <view class="picker-arrow"></view>
+      </view>
+    </picker>
+    <view class="label-sub">生长天数会从这一天开始算「第 N 天」</view>
+  </view>
+
+  <!-- 备注 -->
+  <view class="field">
+    <view class="label">备注</view>
+    <textarea
+      class="textarea"
+      placeholder="入手渠道、初始状态、想观察什么……"
+      placeholder-class="ph"
+      value="{{note}}"
+      bindinput="onNote"
+      maxlength="200"
+      auto-height
+    />
+  </view>
+
+  <view class="danger-zone" wx:if="{{!isNew}}">
+    <view class="del-btn" bindtap="remove">删除这条记录</view>
+  </view>
+
+  <view style="height:{{safeBottom + 60}}px"></view>
+</view>

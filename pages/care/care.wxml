@@ -1,0 +1,212 @@
+<view class="page">
+  <view style="height:{{safeTop}}px"></view>
+
+  <view class="nav">
+    <view class="back" bindtap="goBack">
+      <view class="chev"></view>
+    </view>
+    <view class="nav-mid">
+      <text class="nav-title">{{record.name}}</text>
+      <text class="nav-sub">{{record.emoji}} {{record.species || record.catName}}</text>
+    </view>
+    <view class="nav-ph"></view>
+  </view>
+
+  <!-- 切换 -->
+  <view class="tabs">
+    <view class="tab {{tab === 'manual' ? 'on' : ''}}" bindtap="switchTab" data-tab="manual">
+      <text>养护手册</text>
+      <text class="tab-num mono">{{manual.length}}</text>
+    </view>
+    <view class="tab {{tab === 'log' ? 'on' : ''}}" bindtap="switchTab" data-tab="log">
+      <text>养护记录</text>
+      <text class="tab-num mono">{{logCount}}</text>
+    </view>
+    <view class="tab {{tab === 'plan' ? 'on' : ''}}" bindtap="switchTab" data-tab="plan">
+      <text>计划</text>
+    </view>
+  </view>
+
+  <!-- ================= 手册 ================= -->
+  <view class="pane" wx:if="{{tab === 'manual'}}">
+    <view class="hint">
+      <text class="hint-ico">📖</text>
+      <text>按「{{record.catName}}」类整理的养护要点，随时可以改成你自己的节奏</text>
+    </view>
+
+    <view class="manual">
+      <view class="m-item" wx:for="{{manual}}" wx:key="id">
+        <view class="m-head" bindtap="toggleFold" data-index="{{index}}">
+          <view class="m-idx mono">{{index + 1}}</view>
+          <text class="m-title">{{item.title}}</text>
+          <view class="m-arrow {{item.open ? 'open' : ''}}"></view>
+        </view>
+        <view class="m-body" wx:if="{{item.open}}">
+          <text class="m-text">{{item.body}}</text>
+          <view class="m-ops">
+            <text class="m-op" catchtap="openEdit" data-index="{{index}}">编辑这条</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="m-add" bindtap="openAdd">
+      <text class="m-add-ico">＋</text>
+      <text>加一条自己的要点</text>
+    </view>
+
+    <view class="m-reset" bindtap="resetManual">恢复默认手册</view>
+  </view>
+
+  <!-- ================= 养护记录 ================= -->
+  <view class="pane" wx:if="{{tab === 'log'}}">
+    <view class="cycle-card">
+      <view class="cycle-head">
+        <text class="cycle-title">今天该做什么</text>
+        <text class="cycle-sub">点一下就打卡</text>
+      </view>
+      <view class="cycle-grid">
+        <view
+          class="cyc {{item.overdue ? 'warn' : ''}}"
+          wx:for="{{cycles}}"
+          wx:key="key"
+          data-type="{{item.key}}"
+          bindtap="checkIn"
+        >
+          <text class="cyc-ico">{{item.icon}}</text>
+          <text class="cyc-name">{{item.name}}</text>
+          <text class="cyc-since">{{item.sinceText}}</text>
+          <view class="cyc-warn-dot" wx:if="{{item.overdue && item.need > 0}}"></view>
+        </view>
+      </view>
+    </view>
+
+    <view class="log-head">
+      <text class="log-title">养护时间线</text>
+      <text class="log-tip">长按可删除</text>
+    </view>
+
+    <view class="logs" wx:if="{{groups.length > 0}}">
+      <view class="lg" wx:for="{{groups}}" wx:key="date" wx:for-item="g">
+        <view class="lg-date">
+          <view class="lg-date-dot"></view>
+          <text class="lg-date-text">{{g.label}}</text>
+          <text class="lg-date-raw mono">{{g.date}}</text>
+        </view>
+        <view class="lg-items">
+          <view
+            class="lg-item"
+            wx:for="{{g.items}}"
+            wx:key="id"
+            wx:for-item="l"
+            data-id="{{l.id}}"
+            bindlongpress="deleteLog"
+          >
+            <view class="lg-line"></view>
+            <view class="lg-bullet" style="background:{{l.typeColor}}"></view>
+            <view class="lg-card">
+              <view class="lg-row">
+                <text class="lg-type">{{l.typeIcon}} {{l.typeName}}</text>
+                <text class="lg-time mono">{{l.time}}</text>
+              </view>
+              <view class="lg-note" wx:if="{{l.note}}">{{l.note}}</view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="empty" wx:else>
+      <text class="empty-emoji">🗂️</text>
+      <text class="empty-title">还没有养护记录</text>
+      <text class="empty-sub">在上面点一下「喂食」「换水」，就记下来了</text>
+    </view>
+  </view>
+
+  <!-- ================= 养护计划 ================= -->
+  <view class="pane" wx:if="{{tab === 'plan'}}">
+    <view class="hint">
+      <text class="hint-ico">📅</text>
+      <text>定好周期和用量，到点该做什么一眼就看明白</text>
+    </view>
+
+    <view class="plan-list">
+      <view class="plan-item" wx:for="{{planItems}}" wx:key="key">
+        <view class="pl-head">
+          <text class="pl-ico">{{item.icon}}</text>
+          <view class="pl-title">
+            <text class="pl-name">{{item.name}}</text>
+            <text class="pl-desc" wx:if="{{item.enabled}}">每 {{item.every}} 天一次</text>
+            <text class="pl-desc" wx:else>未启用</text>
+          </view>
+          <switch
+            checked="{{item.enabled}}"
+            color="#3E7C5A"
+            data-key="{{item.key}}"
+            bindchange="togglePlan"
+          />
+        </view>
+
+        <view class="pl-body" wx:if="{{item.enabled}}">
+          <view class="pl-field">
+            <text class="pl-unit">每</text>
+            <input
+              class="pl-input"
+              type="number"
+              value="{{item.every}}"
+              data-key="{{item.key}}"
+              bindinput="onEvery"
+            />
+            <text class="pl-unit">天</text>
+          </view>
+          <input
+            class="pl-amount"
+            placeholder="每次做多少，例如 3 粒粮"
+            placeholder-class="pl-ph"
+            value="{{item.amount}}"
+            data-key="{{item.key}}"
+            bindinput="onAmount"
+            maxlength="24"
+          />
+        </view>
+      </view>
+    </view>
+
+    <view class="plan-actions">
+      <view class="pa-btn primary {{planDirty ? '' : 'dim'}}" bindtap="savePlan">保存计划</view>
+      <view class="pa-btn" bindtap="resetPlan">恢复推荐</view>
+    </view>
+  </view>
+
+  <view style="height:{{safeBottom + 60}}px"></view>
+
+  <!-- 手册编辑弹层 -->
+  <view class="mask" wx:if="{{editorVisible}}" bindtap="closeEditor">
+    <view class="editor" catchtap="noop">
+      <view class="ed-bar"></view>
+      <view class="ed-title">{{editorMode === 'add' ? '新增一条要点' : '编辑要点'}}</view>
+      <input
+        class="ed-input"
+        placeholder="标题，比如「换水频率」"
+        placeholder-class="ed-ph"
+        value="{{draftTitle}}"
+        bindinput="onTitleInput"
+        maxlength="20"
+      />
+      <textarea
+        class="ed-textarea"
+        placeholder="写清楚怎么做、多久做一次、注意什么"
+        placeholder-class="ed-ph"
+        value="{{draftBody}}"
+        bindinput="onBodyInput"
+        maxlength="500"
+        auto-height
+      />
+      <view class="ed-actions">
+        <view class="ed-btn danger" wx:if="{{editorMode === 'edit'}}" bindtap="deleteManual">删除</view>
+        <view class="ed-btn" bindtap="closeEditor">取消</view>
+        <view class="ed-btn primary" bindtap="saveManual">保存</view>
+      </view>
+    </view>
+  </view>
+</view>

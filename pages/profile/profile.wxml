@@ -1,0 +1,311 @@
+<view class="page">
+  <view style="height:{{safeTop}}px"></view>
+
+  <view class="head">
+    <view class="head-title">我的</view>
+    <view class="head-sub">把习惯调成你自己的节奏</view>
+  </view>
+
+  <!-- 统计 -->
+  <view class="stat-card">
+    <view class="sc-item">
+      <text class="sc-num mono">{{stats.records}}</text>
+      <text class="sc-label">条记录</text>
+    </view>
+    <view class="sc-line"></view>
+    <view class="sc-item">
+      <text class="sc-num mono">{{stats.photos}}</text>
+      <text class="sc-label">张照片</text>
+    </view>
+    <view class="sc-line"></view>
+    <view class="sc-item">
+      <text class="sc-num mono">{{stats.careLogs}}</text>
+      <text class="sc-label">次养护</text>
+    </view>
+    <view class="sc-line"></view>
+    <view class="sc-item">
+      <text class="sc-num mono">{{stats.longest}}</text>
+      <text class="sc-label">最长天数</text>
+    </view>
+  </view>
+
+  <!-- 启动方式 -->
+  <view class="group">
+    <view class="group-title">打开小程序时</view>
+    <view class="group-desc">默认直接回到你上次看的那条记录，省一次点击</view>
+
+    <view class="mode-row">
+      <view
+        class="mode {{settings.enterMode === item.key ? 'on' : ''}}"
+        wx:for="{{enterModes}}"
+        wx:key="key"
+        data-key="{{item.key}}"
+        bindtap="setEnterMode"
+      >
+        <view class="mode-radio"><view class="mode-dot"></view></view>
+        <view class="mode-text">
+          <text class="mode-name">{{item.name}}</text>
+          <text class="mode-desc">{{item.desc}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="pick-row" wx:if="{{settings.enterMode === 'fixed'}}" bindtap="openPicker">
+      <text class="pick-label">指定记录</text>
+      <view class="pick-right">
+        <text class="pick-val">{{focusName || '未选择'}}</text>
+        <view class="pick-arrow"></view>
+      </view>
+    </view>
+
+    <view class="row">
+      <view class="row-left">
+        <text class="row-name">先识别再进去</text>
+        <text class="row-desc">启动时先拍一张认出是什么，认不出就让你从记录过的里挑</text>
+      </view>
+      <switch checked="{{settings.startWithIdentify}}" color="#3E7C5A" bindchange="onStartIdentify" />
+    </view>
+  </view>
+
+  <!-- 拍摄 -->
+  <view class="group">
+    <view class="group-title">拍摄</view>
+
+    <view class="row">
+      <view class="row-left">
+        <text class="row-name">随重力翻转</text>
+        <text class="row-desc">手机倒着拿时画面自动转 180°，照片也会存成正的</text>
+      </view>
+      <switch checked="{{settings.gravityFlip}}" color="#3E7C5A" bindchange="onGravityChange" />
+    </view>
+
+    <view class="row">
+      <view class="row-left">
+        <text class="row-name">动态图（Live）</text>
+        <text class="row-desc">每次拍完多录两秒，幻灯片里照片会「活」一下</text>
+      </view>
+      <switch checked="{{settings.livePhoto}}" color="#3E7C5A" bindchange="onLiveChange" />
+    </view>
+
+    <view class="row">
+      <view class="row-left">
+        <text class="row-name">三分线网格</text>
+        <text class="row-desc">取景时显示辅助线</text>
+      </view>
+      <switch checked="{{settings.showGrid}}" color="#3E7C5A" bindchange="onGridChange" />
+    </view>
+
+    <view class="row column">
+      <view class="row-top">
+        <view class="row-left">
+          <text class="row-name">参考底浓度</text>
+          <text class="row-desc">上一次的照片叠加在取景框里的深浅</text>
+        </view>
+        <text class="row-val mono">{{settings.refOpacity}}%</text>
+      </view>
+      <slider
+        class="slider"
+        min="10"
+        max="80"
+        step="2"
+        value="{{settings.refOpacity}}"
+        activeColor="#3E7C5A"
+        backgroundColor="#E8E4DA"
+        block-size="20"
+        bindchange="onRefOpacity"
+      />
+    </view>
+  </view>
+
+  <!-- 幻灯片 -->
+  <view class="group">
+    <view class="group-title">幻灯片</view>
+
+    <view class="row column">
+      <view class="row-top">
+        <view class="row-left">
+          <text class="row-name">每张停留</text>
+          <text class="row-desc">自动播放时每张照片的停留时长</text>
+        </view>
+        <text class="row-val mono">{{settings.autoPlayInterval / 1000}}s</text>
+      </view>
+      <slider
+        class="slider"
+        min="1500"
+        max="6000"
+        step="500"
+        value="{{settings.autoPlayInterval}}"
+        activeColor="#3E7C5A"
+        backgroundColor="#E8E4DA"
+        block-size="20"
+        bindchange="onInterval"
+      />
+    </view>
+
+    <view class="row">
+      <view class="row-left">
+        <text class="row-name">AI 过渡</text>
+        <text class="row-desc">用生成式模型合成两张照片之间的中间帧</text>
+      </view>
+      <switch checked="{{settings.aiTransition}}" color="#3E7C5A" bindchange="onAiToggle" />
+    </view>
+
+    <view class="ai-box">
+      <view class="ai-box-title">过渡服务地址</view>
+      <view class="ai-box-desc">
+        不填也能用：默认走本地的 Ken Burns + 交叉溶解，已经很顺。填了才会调你的服务生成 AI 过渡片段。
+      </view>
+      <view class="endpoint-row">
+        <input
+          class="endpoint-input"
+          placeholder="https://your-api.example.com/ai"
+          placeholder-class="ph"
+          value="{{aiEndpoint}}"
+          bindinput="onEndpoint"
+          bindblur="saveEndpoint"
+        />
+        <view class="endpoint-btn" bindtap="saveEndpoint">保存</view>
+      </view>
+      <view class="cache-row">
+        <text class="cache-text">已缓存 {{aiCacheCount}} 段过渡</text>
+        <text class="cache-clear" bindtap="clearAiCache">清除</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 漂流瓶 -->
+  <view class="group">
+    <view class="group-title">漂流瓶</view>
+    <view class="group-desc">把养的东西打包成一只瓶子放进海里，别人捞到可以点赞和订阅</view>
+
+    <view class="row">
+      <view class="row-left">
+        <text class="row-name">允许投放</text>
+        <text class="row-desc">关掉时不会把任何数据发出去，默认就是关的</text>
+      </view>
+      <switch checked="{{settings.allowDrift}}" color="#3E7C5A" bindchange="onDriftChange" />
+    </view>
+
+    <view class="row tap" bindtap="goBottle">
+      <view class="row-left">
+        <text class="row-name">去捞一只</text>
+        <text class="row-desc">看看别人养的东西长到第几天了</text>
+      </view>
+      <view class="pick-arrow"></view>
+    </view>
+
+    <view class="ai-box">
+      <view class="ai-box-title">评论要先互相同意</view>
+      <view class="ai-box-desc">
+        点赞和订阅是单向的，不需要对方回应；想留言得先发互动申请，对方通过后双方才能互相评论。
+      </view>
+    </view>
+  </view>
+
+  <!-- 识别与云端 -->
+  <view class="group">
+    <view class="group-title">识别与云端</view>
+    <view class="group-desc">识别和漂流瓶都需要后端，云开发是最省事的一条路</view>
+
+    <view class="row tap" bindtap="goIdentify">
+      <view class="row-left">
+        <text class="row-name">现在识别一次</text>
+        <text class="row-desc">不用等下次启动，随时拍一张认认看</text>
+      </view>
+      <view class="pick-arrow"></view>
+    </view>
+
+    <view class="ai-box">
+      <view class="ai-box-title">云开发环境 ID</view>
+      <view class="ai-box-desc">
+        填了之后识别走 recognize 云函数、漂流瓶走 bottle 云函数；不填就使用本地演示数据。
+      </view>
+      <view class="endpoint-row">
+        <input
+          class="endpoint-input"
+          placeholder="例如 cloud1-xxxxxx"
+          placeholder-class="ph"
+          value="{{cloudEnv}}"
+          bindinput="onCloudEnv"
+          bindblur="saveCloudEnv"
+        />
+        <view class="endpoint-btn" bindtap="saveCloudEnv">保存</view>
+      </view>
+      <view class="cache-row">
+        <text class="cache-text">{{cloudReady ? '云端已连接' : '当前为本地演示'}}</text>
+      </view>
+    </view>
+
+    <view class="ai-box">
+      <view class="ai-box-title">识别接口（可选）</view>
+      <view class="ai-box-desc">不想用云函数的话，直接填自己的图片识别服务，接口约定见 README。</view>
+      <view class="endpoint-row">
+        <input
+          class="endpoint-input"
+          placeholder="https://your-api.com/ai"
+          placeholder-class="ph"
+          value="{{recognizeEndpoint}}"
+          bindinput="onRecognizeEndpoint"
+          bindblur="saveRecognizeEndpoint"
+        />
+        <view class="endpoint-btn" bindtap="saveRecognizeEndpoint">保存</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 数据 -->
+  <view class="group">
+    <view class="group-title">数据</view>
+    <view class="row tap" bindtap="exportData">
+      <view class="row-left">
+        <text class="row-name">导出文字数据</text>
+        <text class="row-desc">复制成 JSON，方便备份或迁移</text>
+      </view>
+      <view class="pick-arrow"></view>
+    </view>
+    <view class="row tap" bindtap="clearAll">
+      <view class="row-left">
+        <text class="row-name danger">清空全部数据</text>
+        <text class="row-desc">记录、照片、养护日志一并删除</text>
+      </view>
+      <view class="pick-arrow"></view>
+    </view>
+  </view>
+
+  <view class="about">
+    <text class="about-title">春生夏长 · v1.0</text>
+    <text class="about-text">
+      给花、鸟、鱼、虫记日子的小本子。每天同一角度拍一张，时间会替你把这些照片连成一段会动的记录。
+    </text>
+  </view>
+
+  <view style="height:{{safeBottom + 150}}px"></view>
+
+  <!-- 指定记录选择 -->
+  <view class="mask" wx:if="{{pickerVisible}}" bindtap="closePicker">
+    <view class="picker" catchtap="noop">
+      <view class="picker-bar"></view>
+      <view class="picker-title">选一条固定进入</view>
+      <scroll-view scroll-y class="picker-list">
+        <view
+          class="picker-item {{settings.fixedRecordId === item.id ? 'on' : ''}}"
+          wx:for="{{records}}"
+          wx:key="id"
+          data-id="{{item.id}}"
+          data-name="{{item.name}}"
+          data-emoji="{{item.emoji}}"
+          bindtap="pickRecord"
+        >
+          <image wx:if="{{item.iconPath}}" class="pi-icon" src="{{item.iconPath}}" mode="aspectFill" />
+          <text wx:else class="pi-emoji">{{item.emoji}}</text>
+          <view class="pi-text">
+            <text class="pi-name">{{item.name}}</text>
+            <text class="pi-sub">{{item.catName}} · 第 {{item.days}} 天</text>
+          </view>
+          <view class="pi-check" wx:if="{{settings.fixedRecordId === item.id}}"></view>
+        </view>
+      </scroll-view>
+      <view class="picker-close" bindtap="closePicker">取消</view>
+    </view>
+  </view>
+</view>

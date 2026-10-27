@@ -1,0 +1,77 @@
+<view class="page">
+  <view class="wave-a"></view>
+  <view class="wave-b"></view>
+
+  <view style="height:{{safeTop}}px"></view>
+
+  <view class="nav">
+    <view class="back" bindtap="goBack"><view class="chev"></view></view>
+    <text class="nav-title">漂流瓶</text>
+    <view class="nav-right" bindtap="goThrow">投一只</view>
+  </view>
+
+  <view class="head">
+    <view class="h-title">海面上漂着别人的日子</view>
+    <view class="h-sub">捞一只，看看别人养的东西长到第几天了</view>
+  </view>
+
+  <!-- 捞到的瓶子 -->
+  <view class="bottle {{loading ? 'is-loading' : ''}}" wx:if="{{bottle}}" bindtap="openBottle">
+    <view class="b-cover" style="background:{{bottle.gradient}}">
+      <image wx:if="{{bottle.cover}}" class="b-img" src="{{bottle.cover}}" mode="aspectFill" />
+      <text wx:else class="b-emoji">{{bottle.emoji}}</text>
+      <view class="b-shade"></view>
+      <view class="b-day mono">第 {{bottle.days}} 天</view>
+      <view class="b-photos mono">{{bottle.photoCount}} 张</view>
+    </view>
+
+    <view class="b-body">
+      <view class="b-name">{{bottle.emoji}} {{bottle.name}}</view>
+      <view class="b-meta">{{bottle.species || bottle.catName}} · {{bottle.ownerName}}</view>
+      <view class="b-story" wx:if="{{bottle.story}}">「{{bottle.story}}」</view>
+      <view class="b-foot">
+        <view class="b-stats">
+          <text class="b-stat">♡ {{bottle.likeCount || 0}}</text>
+          <text class="b-stat">◎ {{bottle.subCount || 0}}</text>
+        </view>
+        <text class="b-more">打开看看 ›</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="placeholder" wx:else>
+    <text class="ph-ico">🍾</text>
+    <text class="ph-text">还没有捞到瓶子</text>
+  </view>
+
+  <view class="pick-btn {{loading ? 'busy' : ''}}" bindtap="pick">
+    <text class="pick-ico">🌊</text>
+    <text>{{loading ? '正在打捞…' : '再捞一个'}}</text>
+  </view>
+
+  <view class="demo-tip" wx:if="{{isDemo}}">
+    当前是本地演示：瓶子里是内置样本，点赞、订阅、申请评论都能走完整个流程。开通云开发后自动切到真实数据。
+  </view>
+
+  <!-- 我投放的 -->
+  <view class="mine" wx:if="{{mine.length > 0}}">
+    <view class="mine-head">
+      <text class="mine-title">我投放的</text>
+      <text class="mine-count">{{mine.length}} 只</text>
+    </view>
+    <scroll-view class="rail" scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="rail-inner">
+        <view class="mcard" wx:for="{{mine}}" wx:key="id" data-id="{{item.id}}" bindtap="openMine">
+          <view class="mthumb">
+            <image wx:if="{{item.cover}}" class="mimg" src="{{item.cover}}" mode="aspectFill" />
+            <text wx:else class="memoji">{{item.emoji}}</text>
+          </view>
+          <text class="mname">{{item.name}}</text>
+          <text class="msub">♡ {{item.likeCount || 0}}</text>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view style="height:{{safeBottom + 40}}px"></view>
+</view>

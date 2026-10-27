@@ -1,0 +1,108 @@
+<view class="page" wx:if="{{bottle}}">
+  <!-- 封面 -->
+  <view class="cover" style="background:{{bottle.gradient}}">
+    <image wx:if="{{bottle.cover}}" class="cover-img" src="{{bottle.cover}}" mode="aspectFill" />
+    <text wx:else class="cover-emoji">{{bottle.emoji}}</text>
+    <view class="cover-grad"></view>
+    <view class="back" style="top:{{statusBarHeight + 10}}px" bindtap="goBack">
+      <view class="chev"></view>
+    </view>
+    <view class="cover-meta">
+      <view class="c-day mono">第 {{bottle.days}} 天</view>
+      <view class="c-photos mono">{{bottle.photoCount}} 张照片</view>
+    </view>
+  </view>
+
+  <!-- 主体 -->
+  <view class="sheet">
+    <view class="s-name">{{bottle.emoji}} {{bottle.name}}</view>
+    <view class="s-meta">
+      <text>{{bottle.species || bottle.catName}}</text>
+      <text class="dot">·</text>
+      <text>{{bottle.ownerName}}</text>
+      <text class="dot" wx:if="{{bottle.createdText}}">·</text>
+      <text wx:if="{{bottle.createdText}}">{{bottle.createdText}}投放</text>
+    </view>
+
+    <view class="s-story" wx:if="{{bottle.story}}">「{{bottle.story}}」</view>
+
+    <!-- 互动 -->
+    <view class="acts" wx:if="{{!isOwner}}">
+      <view class="act {{liked ? 'on' : ''}}" bindtap="toggleLike">
+        <text class="act-ico">{{liked ? '♥' : '♡'}}</text>
+        <text class="act-tx">{{liked ? '已喜欢' : '喜欢'}}</text>
+        <text class="act-num mono">{{bottle.likeCount || 0}}</text>
+      </view>
+      <view class="act {{subscribed ? 'on' : ''}}" bindtap="toggleSubscribe">
+        <text class="act-ico">{{subscribed ? '◉' : '◎'}}</text>
+        <text class="act-tx">{{subscribed ? '已订阅' : '订阅'}}</text>
+        <text class="act-num mono">{{bottle.subCount || 0}}</text>
+      </view>
+    </view>
+
+    <view class="owner-tip" wx:if="{{isOwner}}">这是你投放的瓶子，别人的点赞和订阅会显示在这里</view>
+
+    <!-- 评论 -->
+    <view class="cm-head">
+      <text class="cm-title">留言</text>
+      <text class="cm-count">{{comments.length}} 条</text>
+    </view>
+
+    <!-- 授权闸门 -->
+    <view class="gate" wx:if="{{consent === 'none'}}">
+      <view class="gate-ico">🔒</view>
+      <view class="gate-title">评论需要双方同意</view>
+      <view class="gate-desc">发出互动申请，对方通过后你们才能互相留言。点头像不会泄露任何联系方式。</view>
+      <view class="gate-btn" bindtap="requestComment">{{consentBusy ? '发送中…' : '申请互动'}}</view>
+    </view>
+
+    <view class="gate pending" wx:elif="{{consent === 'pending'}}">
+      <view class="gate-ico">⏳</view>
+      <view class="gate-title">申请已发出</view>
+      <view class="gate-desc">等对方通过后就能留言了，先把喜欢点上也不亏。</view>
+    </view>
+
+    <view class="gate rejected" wx:elif="{{consent === 'rejected'}}">
+      <view class="gate-ico">🚪</view>
+      <view class="gate-title">对方暂时不想互动</view>
+      <view class="gate-desc">可以继续订阅这只瓶子，它的更新你还能看到。</view>
+    </view>
+
+    <!-- 评论列表 -->
+    <view class="cms" wx:if="{{comments.length > 0}}">
+      <view class="cm-item" wx:for="{{comments}}" wx:key="id">
+        <view class="cm-avatar">{{item.avatar}}</view>
+        <view class="cm-body">
+          <view class="cm-row">
+            <text class="cm-name">{{item.name}}</text>
+            <text class="cm-time">{{item.timeText}}</text>
+          </view>
+          <text class="cm-text">{{item.content}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="cm-empty" wx:if="{{consent === 'accepted' && comments.length === 0}}">
+      互动已经开通，说点什么吧
+    </view>
+
+    <view style="height:{{consent === 'accepted' ? 180 : 60}}px"></view>
+  </view>
+
+  <!-- 评论输入 -->
+  <view class="input-bar" wx:if="{{consent === 'accepted'}}" style="padding-bottom:{{safeBottom + 16}}px">
+    <input
+      class="input"
+      placeholder="说点什么…"
+      placeholder-class="ph"
+      value="{{draft}}"
+      bindinput="onDraft"
+      confirm-type="send"
+      bindconfirm="submitComment"
+      maxlength="200"
+    />
+    <view class="send {{draft ? 'on' : ''}}" bindtap="submitComment">
+      {{submitting ? '…' : '发送'}}
+    </view>
+  </view>
+</view>

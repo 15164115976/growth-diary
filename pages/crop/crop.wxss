@@ -1,0 +1,248 @@
+.page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #0c0f0c;
+  color: #fff;
+  overflow: hidden;
+}
+
+/* ---------- 导航 ---------- */
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  padding: 8rpx 28rpx 16rpx;
+  flex-shrink: 0;
+}
+
+.nav-btn {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.nav-btn:active {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.x {
+  position: relative;
+  width: 26rpx;
+  height: 26rpx;
+}
+
+.x::before,
+.x::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  height: 3rpx;
+  background: #fff;
+  border-radius: 2rpx;
+}
+
+.x::before {
+  transform: rotate(45deg);
+}
+
+.x::after {
+  transform: rotate(-45deg);
+}
+
+.nav-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  letter-spacing: 1rpx;
+}
+
+.nav-save {
+  height: 66rpx;
+  padding: 0 34rpx;
+  border-radius: 33rpx;
+  background: #fff;
+  color: #16301f;
+  font-size: 26rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.nav-save:active {
+  opacity: 0.85;
+}
+
+.nav-save.busy {
+  opacity: 0.6;
+}
+
+/* ---------- 裁剪区 ---------- */
+.stage {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.photo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: block;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+.crop-box {
+  position: absolute;
+  box-sizing: border-box;
+  border: 2rpx solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 0 2000px rgba(8, 10, 8, 0.62);
+  pointer-events: none;
+}
+
+.gv {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1rpx;
+  background: rgba(255, 255, 255, 0.26);
+}
+
+.gv.g1 {
+  left: 33.33%;
+}
+
+.gv.g2 {
+  left: 66.66%;
+}
+
+.gh {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1rpx;
+  background: rgba(255, 255, 255, 0.26);
+}
+
+.gh.g1 {
+  top: 33.33%;
+}
+
+.gh.g2 {
+  top: 66.66%;
+}
+
+.corner {
+  position: absolute;
+  width: 40rpx;
+  height: 40rpx;
+  border: 5rpx solid #fff;
+}
+
+.corner.tl {
+  left: -2rpx;
+  top: -2rpx;
+  border-right: none;
+  border-bottom: none;
+}
+
+.corner.tr {
+  right: -2rpx;
+  top: -2rpx;
+  border-left: none;
+  border-bottom: none;
+}
+
+.corner.bl {
+  left: -2rpx;
+  bottom: -2rpx;
+  border-right: none;
+  border-top: none;
+}
+
+.corner.br {
+  right: -2rpx;
+  bottom: -2rpx;
+  border-left: none;
+  border-top: none;
+}
+
+.stage-tip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 24rpx;
+  text-align: center;
+  font-size: 20rpx;
+  color: rgba(255, 255, 255, 0.45);
+  letter-spacing: 1rpx;
+  pointer-events: none;
+}
+
+/* ---------- 工具 ---------- */
+.tools {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 22rpx 28rpx 0;
+  flex-shrink: 0;
+}
+
+.ratios {
+  flex: 1;
+  white-space: nowrap;
+}
+
+.ratio-row {
+  display: inline-flex;
+  gap: 12rpx;
+}
+
+.ratio {
+  min-width: 92rpx;
+  height: 64rpx;
+  padding: 0 22rpx;
+  border-radius: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 23rpx;
+  color: rgba(255, 255, 255, 0.62);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1rpx solid rgba(255, 255, 255, 0.12);
+}
+
+.ratio.on {
+  background: #fff;
+  color: #16301f;
+  font-weight: 700;
+  border-color: transparent;
+}
+
+.reset {
+  width: 96rpx;
+  height: 64rpx;
+  border-radius: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 23rpx;
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.reset:active {
+  background: rgba(255, 255, 255, 0.2);
+}

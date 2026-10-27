@@ -1,0 +1,92 @@
+<view class="page">
+  <view style="height:{{safeTop}}px"></view>
+
+  <view class="head">
+    <view class="head-title">影集</view>
+    <view class="head-sub">把日子连起来看，才知道它们长了多少</view>
+  </view>
+
+  <view class="stats-row" wx:if="{{list.length > 0}}">
+    <view class="st">
+      <text class="st-num mono">{{totalRecords}}</text>
+      <text class="st-label">条故事线</text>
+    </view>
+    <view class="st-line"></view>
+    <view class="st">
+      <text class="st-num mono">{{totalPhotos}}</text>
+      <text class="st-label">张瞬间</text>
+    </view>
+    <view class="st-line"></view>
+    <view class="st">
+      <text class="st-num mono">{{longest}}</text>
+      <text class="st-label">最长天数</text>
+    </view>
+  </view>
+
+  <view class="list" wx:if="{{list.length > 0}}">
+    <view class="swipe" wx:for="{{list}}" wx:key="id">
+      <!-- 左滑露出的操作 -->
+      <view class="swipe-actions" style="width:{{actionsW}}px">
+        <view class="sa" catchtap="moveTop" data-id="{{item.id}}">
+          <text class="sa-ico">⤒</text>
+          <text class="sa-tx">置顶</text>
+        </view>
+        <view class="sa" catchtap="moveUp" data-id="{{item.id}}">
+          <text class="sa-ico">↑</text>
+          <text class="sa-tx">上移</text>
+        </view>
+        <view class="sa danger" catchtap="removeOne" data-id="{{item.id}}">
+          <text class="sa-ico">✕</text>
+          <text class="sa-tx">删除</text>
+        </view>
+      </view>
+
+      <view
+        class="item"
+        style="transform: translateX({{offsets[item.id] || 0}}px); {{draggingId === item.id ? 'transition: none;' : ''}}"
+        data-id="{{item.id}}"
+        bindtap="play"
+        bindlongpress="onLongPress"
+        bindtouchstart="onTouchStart"
+        bindtouchmove="onTouchMove"
+        bindtouchend="onTouchEnd"
+      >
+        <view class="thumb" style="background:{{item.catSoft}}">
+          <image wx:if="{{item.cover}}" class="thumb-img" src="{{item.cover}}" mode="aspectFill" lazy-load />
+          <text wx:else class="thumb-emoji">{{item.emoji}}</text>
+          <view class="thumb-count mono">{{item.photoCount}} 张</view>
+          <view class="thumb-cover-tag" wx:if="{{item.coverIsCustom}}">自定义封面</view>
+        </view>
+
+        <view class="info">
+          <view class="info-name">
+            <text class="info-emoji">{{item.emoji}}</text>
+            <text>{{item.name}}</text>
+          </view>
+          <view class="info-species">{{item.species}}</view>
+          <view class="info-meta">
+            <text class="meta-chip" style="color:{{item.catColor}};background:{{item.catSoft}}">第 {{item.days}} 天</text>
+            <text class="meta-last">{{item.lastText}}更新</text>
+          </view>
+        </view>
+
+        <view class="play-btn" catchtap="play" data-id="{{item.id}}">
+          <view class="play-tri"></view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty-box" wx:else>
+    <text class="empty-ico">🎞️</text>
+    <text class="empty-title">影集还是空的</text>
+    <text class="empty-sub">先去拍下第一张，之后这里会把它们连成一段片子</text>
+    <view class="empty-btn" bindtap="goHome">去记录</view>
+  </view>
+
+  <view class="foot-tip" wx:if="{{list.length > 0}}">
+    <text>左滑可置顶 / 排序 / 删除 · 点卡片看大图</text>
+  </view>
+
+  <view style="height:{{safeBottom + 150}}px"></view>
+</view>

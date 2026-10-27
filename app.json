@@ -1,0 +1,57 @@
+{
+  "pages": [
+    "pages/identify/identify",
+    "pages/index/index",
+    "pages/gallery/gallery",
+    "pages/profile/profile",
+    "pages/detail/detail",
+    "pages/capture/capture",
+    "pages/slideshow/slideshow",
+    "pages/care/care",
+    "pages/edit/edit",
+    "pages/crop/crop",
+    "pages/bottle/bottle",
+    "pages/bottle-view/bottle-view"
+  ],
+  "window": {
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#F6F4EF",
+    "navigationBarTitleText": "春生夏长",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#F6F4EF",
+    "navigationStyle": "custom"
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#8A9186",
+    "selectedColor": "#3E7C5A",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "记录"
+      },
+      {
+        "pagePath": "pages/gallery/gallery",
+        "text": "影集"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的"
+      }
+    ]
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "用于记录拍摄地点，便于还原同一角度"
+    },
+    "scope.record": {
+      "desc": "用于给照片录制一小段动态画面（Live），不录音也能拍"
+    }
+  },
+  "requiredPrivateInfos": [],
+  "lazyCodeLoading": "requiredComponents",
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

@@ -1,0 +1,115 @@
+<view class="page">
+  <view class="glow-a"></view>
+  <view class="glow-b"></view>
+
+  <view style="height:{{statusBarHeight}}px"></view>
+
+  <!-- 顶部品牌栏 -->
+  <view class="topbar">
+    <view class="brand-wrap">
+      <view class="brand">春生夏长</view>
+      <view class="brand-en">GROWTH DIARY</view>
+    </view>
+    <view class="set-btn" bindtap="goSettings" style="position: relative; left: -2rpx; top: 88rpx">
+      <view class="sdot"></view>
+      <view class="sdot"></view>
+      <view class="sdot"></view>
+    </view>
+  </view>
+
+  <view class="subline" style="position: relative; left: 0rpx; top: 24rpx">
+    <text class="greeting">{{greeting}}</text>
+    <text class="today">{{todayText}}</text>
+  </view>
+
+  <!-- 继续观察 -->
+  <view class="hero fade-up" wx:if="{{focus}}" bindtap="openRecord" data-id="{{focus.id}}">
+    <view class="hero-media">
+      <image wx:if="{{focus.coverPath}}" class="hero-img" src="{{focus.coverPath}}" mode="aspectFill" />
+      <view
+        wx:else
+        class="hero-placeholder"
+        style="background:linear-gradient(150deg,{{focus.catSoft}} 0%,{{focus.catColor}}2E 100%)"
+      >
+        <text class="hero-ghost">{{focus.emoji}}</text>
+      </view>
+      <view class="hero-shade" wx:if="{{focus.coverPath}}"></view>
+    </view>
+
+    <view class="hero-body {{focus.coverPath ? 'on-dark' : 'on-light'}}">
+      <view class="hero-row">
+        <view class="hero-tag">继续观察</view>
+        <view class="hero-day mono">第 {{focus.days}} 天</view>
+      </view>
+      <view class="hero-name">{{focus.emoji}} {{focus.name}}</view>
+      <view class="hero-meta">{{focus.species || focus.catName}} · 已拍 {{focus.photoCount}} 张</view>
+      <view class="hero-foot">
+        <view class="hero-last">
+          <view class="pulse"></view>
+          <text>{{focus.shotToday ? '今天已记录' : focus.lastShotText}}</text>
+        </view>
+        <view class="shoot" catchtap="quickShoot" data-id="{{focus.id}}">
+          <view class="shoot-ico"></view>
+          <text class="shoot-text">拍一张</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 四类记录 -->
+  <view class="section">
+    <view class="section-head">
+      <text class="section-title">我的记录</text>
+      <text class="section-sub">{{totalCount}} 项 · {{totalPhotos}} 张</text>
+    </view>
+
+    <view class="group" wx:for="{{groups}}" wx:key="key" wx:for-item="g">
+      <view class="group-head">
+        <view class="group-left">
+          <view class="cat-bar" style="background:{{g.category.color}}"></view>
+          <text class="group-name">{{g.category.icon}} {{g.category.name}}</text>
+          <text class="group-hint">{{g.category.hint}}</text>
+        </view>
+        <view class="group-add" bindtap="addRecord" data-cat="{{g.key}}">
+          <text class="group-add-ico">＋</text>
+        </view>
+      </view>
+
+      <scroll-view class="rail" scroll-x enhanced show-scrollbar="{{false}}">
+        <view class="rail-inner">
+          <view
+            class="rec"
+            wx:for="{{g.records}}"
+            wx:key="id"
+            wx:for-item="r"
+            bindtap="openRecord"
+            data-id="{{r.id}}"
+          >
+            <view class="rec-thumb" style="background:{{r.catSoft}}">
+              <image wx:if="{{r.coverPath}}" class="rec-img" src="{{r.coverPath}}" mode="aspectFill" lazy-load />
+              <text wx:else class="rec-emoji">{{r.emoji}}</text>
+              <view class="rec-badge" wx:if="{{r.shotToday}}">今日</view>
+              <view class="rec-count mono" wx:if="{{r.photoCount > 1}}">{{r.photoCount}}张</view>
+            </view>
+            <view class="rec-name">{{r.name}}</view>
+            <view class="rec-sub">第 {{r.days}} 天</view>
+          </view>
+
+          <view class="rec rec-new" bindtap="addRecord" data-cat="{{g.key}}">
+            <view class="rec-new-box" style="border-color:{{g.category.color}}55">
+              <text class="rec-new-plus" style="color:{{g.category.color}}">＋</text>
+            </view>
+            <view class="rec-name">添加</view>
+            <view class="rec-sub">新{{g.category.name}}</view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+
+  <view class="footer-tip">
+    <text>每天同一角度拍一张，时间会替你把变化连起来</text>
+  </view>
+
+  <view style="height:{{safeBottom + 130}}px"></view>
+</view>

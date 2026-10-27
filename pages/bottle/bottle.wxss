@@ -1,0 +1,367 @@
+.page {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* 水汽感 */
+.wave-a {
+  position: absolute;
+  top: -180rpx;
+  right: -160rpx;
+  width: 620rpx;
+  height: 620rpx;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(27, 160, 150, 0.16) 0%, rgba(27, 160, 150, 0) 70%);
+  pointer-events: none;
+}
+
+.wave-b {
+  position: absolute;
+  top: 260rpx;
+  left: -240rpx;
+  width: 560rpx;
+  height: 560rpx;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(63, 134, 212, 0.12) 0%, rgba(63, 134, 212, 0) 70%);
+  pointer-events: none;
+}
+
+/* ---------- 导航 ---------- */
+.nav {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 12rpx 28rpx 8rpx;
+}
+
+.back {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 4rpx 16rpx rgba(46, 58, 44, 0.07);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.back:active {
+  transform: scale(0.94);
+}
+
+.chev {
+  width: 18rpx;
+  height: 18rpx;
+  border-left: 4rpx solid #232a22;
+  border-bottom: 4rpx solid #232a22;
+  transform: rotate(45deg);
+  margin-left: -4rpx;
+  border-radius: 2rpx;
+}
+
+.nav-title {
+  flex: 1;
+  text-align: center;
+  font-size: 32rpx;
+  font-weight: 700;
+  letter-spacing: 2rpx;
+}
+
+.nav-right {
+  font-size: 23rpx;
+  color: var(--brand);
+  padding: 12rpx 8rpx;
+  flex-shrink: 0;
+}
+
+/* ---------- 标题 ---------- */
+.head {
+  position: relative;
+  padding: 24rpx 36rpx 22rpx;
+}
+
+.h-title {
+  font-size: 42rpx;
+  font-weight: 700;
+  letter-spacing: 1rpx;
+  line-height: 1.35;
+}
+
+.h-sub {
+  font-size: 22rpx;
+  color: var(--ink-3);
+  margin-top: 8rpx;
+}
+
+/* ---------- 瓶子卡 ---------- */
+.bottle {
+  position: relative;
+  margin: 0 32rpx;
+  background: #fff;
+  border-radius: 36rpx;
+  overflow: hidden;
+  box-shadow: 0 18rpx 48rpx rgba(46, 58, 44, 0.14);
+  animation: bottleIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes bottleIn {
+  from {
+    opacity: 0;
+    transform: translateY(40rpx) rotate(-1.2deg) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(0) scale(1);
+  }
+}
+
+.bottle.is-loading {
+  opacity: 0.55;
+}
+
+.bottle:active {
+  transform: scale(0.99);
+}
+
+.b-cover {
+  position: relative;
+  height: 340rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.b-img {
+  width: 100%;
+  height: 100%;
+}
+
+.b-emoji {
+  font-size: 150rpx;
+  opacity: 0.9;
+  filter: drop-shadow(0 12rpx 24rpx rgba(0, 0, 0, 0.14));
+}
+
+.b-shade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 40%;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.32) 100%);
+}
+
+.b-day {
+  position: absolute;
+  left: 26rpx;
+  bottom: 24rpx;
+  font-size: 22rpx;
+  font-weight: 700;
+  color: #fff;
+  padding: 6rpx 18rpx;
+  border-radius: 20rpx;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8rpx);
+  letter-spacing: 1rpx;
+}
+
+.b-photos {
+  position: absolute;
+  right: 26rpx;
+  bottom: 24rpx;
+  font-size: 19rpx;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.b-body {
+  padding: 26rpx 30rpx 28rpx;
+}
+
+.b-name {
+  font-size: 38rpx;
+  font-weight: 700;
+  letter-spacing: 1rpx;
+}
+
+.b-meta {
+  font-size: 22rpx;
+  color: var(--ink-3);
+  margin-top: 6rpx;
+}
+
+.b-story {
+  margin-top: 18rpx;
+  font-size: 25rpx;
+  color: var(--ink-2);
+  line-height: 1.72;
+}
+
+.b-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 22rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid var(--line);
+}
+
+.b-stats {
+  display: flex;
+  gap: 26rpx;
+}
+
+.b-stat {
+  font-size: 22rpx;
+  color: var(--ink-2);
+}
+
+.b-more {
+  font-size: 22rpx;
+  color: var(--brand);
+  font-weight: 600;
+}
+
+/* 空态 */
+.placeholder {
+  margin: 0 32rpx;
+  height: 300rpx;
+  border-radius: 36rpx;
+  border: 2rpx dashed #d8d3c7;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14rpx;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.ph-ico {
+  font-size: 66rpx;
+  opacity: 0.5;
+}
+
+.ph-text {
+  font-size: 23rpx;
+  color: var(--ink-3);
+}
+
+/* ---------- 捞按钮 ---------- */
+.pick-btn {
+  margin: 28rpx 32rpx 0;
+  height: 100rpx;
+  border-radius: 50rpx;
+  background: linear-gradient(135deg, #2f8f8a 0%, #3e7c5a 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  font-size: 30rpx;
+  font-weight: 700;
+  letter-spacing: 2rpx;
+  box-shadow: 0 14rpx 32rpx rgba(47, 143, 138, 0.3);
+}
+
+.pick-btn:active {
+  transform: scale(0.98);
+}
+
+.pick-btn.busy {
+  opacity: 0.7;
+}
+
+.pick-ico {
+  font-size: 32rpx;
+}
+
+.demo-tip {
+  margin: 20rpx 40rpx 0;
+  font-size: 19rpx;
+  color: var(--ink-3);
+  line-height: 1.7;
+  text-align: center;
+}
+
+/* ---------- 我投放的 ---------- */
+.mine {
+  margin-top: 44rpx;
+}
+
+.mine-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0 36rpx 14rpx;
+}
+
+.mine-title {
+  font-size: 27rpx;
+  font-weight: 700;
+}
+
+.mine-count {
+  font-size: 20rpx;
+  color: var(--ink-3);
+}
+
+.rail {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.rail-inner {
+  display: inline-flex;
+  gap: 18rpx;
+  padding: 0 32rpx 8rpx;
+}
+
+.mcard {
+  width: 132rpx;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.mcard:active {
+  opacity: 0.8;
+}
+
+.mthumb {
+  width: 132rpx;
+  height: 132rpx;
+  border-radius: 26rpx;
+  overflow: hidden;
+  background: var(--bg-deep);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mimg {
+  width: 100%;
+  height: 100%;
+}
+
+.memoji {
+  font-size: 54rpx;
+}
+
+.mname {
+  font-size: 21rpx;
+  font-weight: 600;
+  max-width: 132rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.msub {
+  font-size: 18rpx;
+  color: var(--ink-3);
+}

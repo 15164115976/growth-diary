@@ -65,25 +65,39 @@
 
     <view class="group" wx:for="{{groups}}" wx:key="key" wx:for-item="g">
       <view class="group-head">
-        <view class="group-left">
+        <view class="group-left" bindlongpress="openCatEdit" data-cat="{{g.key}}">
           <view class="cat-bar" style="background:{{g.category.color}}"></view>
           <text class="group-name">{{g.category.icon}} {{g.category.name}}</text>
           <text class="group-hint">{{g.category.hint}}</text>
+          <view class="cat-edit" catchtap="openCatEdit" data-cat="{{g.key}}">✎</view>
         </view>
         <view class="group-add" bindtap="addRecord" data-cat="{{g.key}}">
           <text class="group-add-ico">＋</text>
         </view>
       </view>
 
-      <scroll-view class="rail" scroll-x enhanced show-scrollbar="{{false}}">
+      <scroll-view
+        class="rail"
+        scroll-x="{{!(dragging && dragCat === g.key)}}"
+        enhanced
+        show-scrollbar="{{false}}"
+      >
         <view class="rail-inner">
           <view
-            class="rec"
+            class="rec {{dragId === r.id ? 'is-drag' : ''}}"
             wx:for="{{g.records}}"
             wx:key="id"
             wx:for-item="r"
-            bindtap="openRecord"
+            wx:for-index="ri"
             data-id="{{r.id}}"
+            data-cat="{{g.key}}"
+            data-index="{{ri}}"
+            bindtap="openRecord"
+            bindtouchstart="onCardTouchStart"
+            bindlongpress="onCardLongPress"
+            bindtouchmove="onCardTouchMove"
+            bindtouchend="onCardTouchEnd"
+            bindtouchcancel="onCardTouchEnd"
           >
             <view class="rec-thumb" style="background:{{r.catSoft}}">
               <image wx:if="{{r.coverPath}}" class="rec-img" src="{{r.coverPath}}" mode="aspectFill" lazy-load />
@@ -108,7 +122,42 @@
   </view>
 
   <view class="footer-tip">
-    <text>每天同一角度拍一张，时间会替你把变化连起来</text>
+    <text>长按卡片可拖动排序 · 点分类名旁的小笔可改</text>
+  </view>
+
+  <!-- 分类编辑 -->
+  <view class="mask" wx:if="{{catSheet}}" bindtap="closeCatEdit">
+    <view class="sheet" catchtap="noop">
+      <view class="sheet-bar"></view>
+      <view class="sheet-title">改这一类</view>
+      <view class="sheet-sub">只改你自己看到的叫法和图标，不影响记录内容</view>
+
+      <input
+        class="sheet-input"
+        value="{{catDraft.name}}"
+        bindinput="onCatName"
+        placeholder="分类名称，比如「多肉」"
+        placeholder-class="sheet-ph"
+        maxlength="6"
+      />
+
+      <view class="emoji-grid">
+        <view
+          class="emoji-item {{catDraft.icon === item ? 'on' : ''}}"
+          wx:for="{{catEmojis}}"
+          wx:key="*this"
+          data-e="{{item}}"
+          bindtap="pickCatEmoji"
+        >
+          {{item}}
+        </view>
+      </view>
+
+      <view class="sheet-actions">
+        <view class="sheet-btn" bindtap="resetCat">恢复默认</view>
+        <view class="sheet-btn primary" bindtap="saveCatEdit">保存</view>
+      </view>
+    </view>
   </view>
 
   <view style="height:{{safeBottom + 130}}px"></view>

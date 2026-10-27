@@ -10,6 +10,7 @@
     "pages/care/care",
     "pages/edit/edit",
     "pages/crop/crop",
+    "pages/photo-edit/photo-edit",
     "pages/bottle/bottle",
     "pages/bottle-view/bottle-view"
   ],

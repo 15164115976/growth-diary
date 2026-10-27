@@ -16,10 +16,22 @@ Page({
     hasData: false,
     enterMode: 'last',
     scrollInto: '',
+
+    // 拖动排序
+    dragging: false,
+    dragId: '',
+    dragCat: '',
+
+    // 分类编辑
+    catSheet: false,
+    catDraft: { key: '', name: '', icon: '' },
+    catEmojis: [],
   },
 
   onLoad() {
     const app = getApp();
+    const win = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync();
+    this.windowWidth = win.windowWidth || 375;
     const now = new Date();
     const hour = now.getHours();
     let greeting = '晚上好';
@@ -114,7 +126,124 @@ Page({
     }, 320);
   },
 
+  /* ---------------- 拖动排序 ---------------- */
+  onCardTouchStart(e) {
+    const { cat, index } = e.currentTarget.dataset;
+    this.touch = {
+      x: e.touches[0].clientX,
+      y: e.touches[0].clientY,
+      cat,
+      index: Number(index),
+    };
+  },
+
+  onCardLongPress(e) {
+    if (!this.touch) return;
+    const { cat, index } = e.currentTarget.dataset;
+    const gi = this.data.groups.findIndex((g) => g.key === cat);
+    if (gi < 0) return;
+    const rec = this.data.groups[gi].records[Number(index)];
+    if (!rec) return;
+
+    wx.vibrateShort && wx.vibrateShort({ type: 'medium' });
+    // 卡片 184rpx + 间距 20rpx
+    const itemW = (204 / 750) * this.windowWidth;
+    this.drag = Object.assign({}, this.touch, {
+      cat,
+      cur: Number(index),
+      itemW,
+    });
+    this.setData({ dragging: true, dragId: rec.id, dragCat: cat });
+  },
+
+  onCardTouchMove(e) {
+    const d = this.drag;
+    if (!d) return;
+    const gi = this.data.groups.findIndex((g) => g.key === d.cat);
+    if (gi < 0) return;
+    const len = this.data.groups[gi].records.length;
+
+    const dx = e.touches[0].clientX - d.x;
+    const step = Math.round(dx / d.itemW);
+    if (step === 0) return;
+
+    const from = d.cur;
+    const to = Math.max(0, Math.min(len - 1, from + step));
+    if (to === from) return;
+
+    const arr = this.data.groups[gi].records.slice();
+    const moved = arr.splice(from, 1)[0];
+    arr.splice(to, 0, moved);
+
+    d.cur = to;
+    d.x = e.touches[0].clientX; // 重置基准，避免位移累积
+    this.setData({ [`groups[${gi}].records`]: arr });
+  },
+
+  onCardTouchEnd() {
+    const d = this.drag;
+    this.touch = null;
+    if (!d) return;
+    this.drag = null;
+
+    const gi = this.data.groups.findIndex((g) => g.key === d.cat);
+    if (gi > -1) {
+      const ids = this.data.groups[gi].records.map((r) => r.id);
+      store.reorderInCategory(d.cat, ids);
+    }
+    // 拖动结束后短暂屏蔽 click，避免误进详情
+    this.justDragged = true;
+    setTimeout(() => {
+      this.justDragged = false;
+    }, 320);
+    this.setData({ dragging: false, dragId: '', dragCat: '' });
+  },
+
+  /* ---------------- 分类编辑 ---------------- */
+  openCatEdit(e) {
+    const key = e.currentTarget.dataset.cat;
+    const cat = store.categoryOf(key);
+    this.setData({
+      catSheet: true,
+      catDraft: { key, name: cat.name, icon: cat.icon },
+      catEmojis: store.EMOJI_SETS[key] || [],
+    });
+  },
+
+  closeCatEdit() {
+    this.setData({ catSheet: false });
+  },
+
+  onCatName(e) {
+    this.setData({ 'catDraft.name': e.detail.value });
+  },
+
+  pickCatEmoji(e) {
+    this.setData({ 'catDraft.icon': e.currentTarget.dataset.e });
+  },
+
+  saveCatEdit() {
+    const d = this.data.catDraft;
+    const name = (d.name || '').trim();
+    if (!name) {
+      wx.showToast({ title: '起个名字', icon: 'none' });
+      return;
+    }
+    store.saveCategory(d.key, { name, icon: d.icon });
+    this.setData({ catSheet: false });
+    this.refresh();
+    wx.showToast({ title: '已保存', icon: 'success' });
+  },
+
+  resetCat() {
+    store.resetCategory(this.data.catDraft.key);
+    this.setData({ catSheet: false });
+    this.refresh();
+    wx.showToast({ title: '已恢复默认', icon: 'none' });
+  },
+
   openRecord(e) {
+    if (this.justDragged) return;
     const { id } = e.currentTarget.dataset;
     if (!id) return;
     store.setLastRecordId(id);
@@ -143,6 +272,8 @@ Page({
   goSettings() {
     wx.switchTab({ url: '/pages/profile/profile' });
   },
+
+  noop() {},
 
   onShareAppMessage() {
     return {

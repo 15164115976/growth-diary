@@ -707,3 +707,27 @@
   color: #929a90;
   flex-shrink: 0;
 }
+
+/* 编辑按钮 */
+.edit-btn {
+  pointer-events: auto;
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1rpx solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.edit-btn:active {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.edit-ico {
+  font-size: 26rpx;
+  color: #fff;
+  line-height: 1;
+}

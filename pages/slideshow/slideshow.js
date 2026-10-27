@@ -24,6 +24,7 @@ Page({
     liveVideo: '',
     hasLive: false,
     livePlaying: false,
+    liveAuto: false,
     landscape: false,
     calendarVisible: false,
     calendarMonths: [],
@@ -69,6 +70,7 @@ Page({
         safeBottom: app.globalData.safeBottom,
         aiMode: !!settings.aiTransition,
         aiConfigured: !!settings.aiEndpoint,
+        liveAuto: settings.liveAuto !== false,
         interval: settings.autoPlayInterval || 3200,
       },
       () => {
@@ -101,6 +103,37 @@ Page({
   onHide() {
     this.setData({ playing: false });
     this.clearTimer();
+  },
+
+  onShow() {
+    this.applyEditResult();
+  },
+
+  /** 编辑页保存后回来，替换当前照片并重绘 */
+  applyEditResult() {
+    const app = getApp();
+    const r = app.globalData && app.globalData.editResult;
+    if (!r || r.recordId !== this.data.id) return;
+    app.globalData.editResult = null;
+
+    const saved = store.persistImage(r.path, 'photos');
+    const raw = store.getRecord(this.data.id);
+    if (!raw) return;
+    const photo = (raw.photos || []).find((x) => x.id === r.photoId);
+    if (!photo) return;
+
+    const oldPath = photo.path;
+    photo.path = saved;
+    if (raw.coverPath === oldPath) raw.coverPath = saved;
+    store.updateRecord(this.data.id, { photos: raw.photos, coverPath: raw.coverPath });
+    store.removeFile(oldPath);
+
+    // 刷新本地数据并重画当前帧
+    const record = store.decorate(store.getRecord(this.data.id));
+    this.setData({ photos: record.photos, record }, () => {
+      this.renderSlide(this.data.index, true);
+      wx.showToast({ title: '已更新', icon: 'success' });
+    });
   },
 
   /* ---------------- 渲染一帧 ---------------- */
@@ -142,6 +175,7 @@ Page({
         'layers[1].z': 1,
         'layers[1].out': false,
       });
+      this.maybeAutoLive(item);
       return;
     }
 
@@ -161,6 +195,15 @@ Page({
       [`layers[${cur}].out`]: true,
     });
     this.cur = nxt;
+    this.maybeAutoLive(item);
+  },
+
+  /** 开了「自动播动图」就在切到这张后播一遍 */
+  maybeAutoLive(item) {
+    clearTimeout(this.liveTimer);
+    if (!this.data.liveAuto) return;
+    if (!item || !item.live || !item.live.path) return;
+    this.liveTimer = setTimeout(() => this.playLive(), 620);
   },
 
   /* ---------------- Live 片段 ---------------- */
@@ -172,15 +215,47 @@ Page({
     if (this.data.liveVideo) this.setData({ liveVideo: '' });
   },
 
-  /** 手动播放当前照片的动态片段（按了才动） */
+  /** 播放当前照片的动态片段 */
   playLive() {
     const p = this.data.photos[this.data.index];
-    if (!p || !p.live || !p.live.path) {
-      wx.showToast({ title: '这张没有动态片段', icon: 'none' });
-      return;
-    }
+    if (!p || !p.live || !p.live.path) return;
     if (this.data.livePlaying) return;
     this.setData({ livePlaying: true, liveVideo: p.live.path });
+  },
+
+  /** LIVE 按钮：切换「切换照片时是否自动播动图」 */
+  toggleLiveAuto() {
+    const next = !this.data.liveAuto;
+    this.setData({ liveAuto: next });
+    store.saveSettings({ liveAuto: next });
+    wx.showToast({
+      title: next ? '已开：换图自动播动图' : '已关：只在短按时播',
+      icon: 'none',
+    });
+    if (next) this.playLive();
+  },
+
+  /** 短按画面：有动图就播，没有就当暂停/继续 */
+  onShortTap() {
+    const p = this.data.photos[this.data.index];
+    if (p && p.live && p.live.path) {
+      if (this.data.livePlaying) {
+        this.setData({ liveVideo: '', livePlaying: false });
+      } else {
+        this.playLive();
+      }
+      return;
+    }
+    this.togglePlay();
+  },
+
+  /** 进编辑 */
+  goEdit() {
+    const p = this.data.photos[this.data.index];
+    if (!p) return;
+    wx.navigateTo({
+      url: `/pages/photo-edit/photo-edit?recordId=${this.data.id}&photoId=${p.id}`,
+    });
   },
 
   onLiveEnd() {
@@ -201,10 +276,19 @@ Page({
     if (!t) return;
     const dx = t.clientX - s.x;
     const dy = t.clientY - s.y;
-    if (Math.abs(dy) < 90) return;
-    if (Math.abs(dy) < Math.abs(dx) * 1.3) return;
-    if (dy < 0) this.openCalendar();
-    else this.openCare();
+
+    // 纵向：上滑日历 / 下滑养护
+    if (Math.abs(dy) > 90 && Math.abs(dy) > Math.abs(dx) * 1.3) {
+      if (dy < 0) this.openCalendar();
+      else this.openCare();
+      return;
+    }
+
+    // 横向：左右切换
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+      this.renderSlide(dx < 0 ? this.data.index + 1 : this.data.index - 1);
+      this.startAuto();
+    }
   },
 
   /* ---------------- 拍摄日历 ---------------- */

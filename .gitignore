@@ -12,3 +12,7 @@ $RECYCLE.BIN/
 
 # Node.js
 node_modules/
+miniprogram_npm/
+
+# 微信开发者工具的私有配置（含本地路径与个人设置）
+project.private.config.json

@@ -38,7 +38,30 @@ Page({
 
   onShow() {
     this.applyCropResult();
+    this.applyEditResult();
     if (this.data.id) this.load();
+  },
+
+  /** 照片编辑页保存后回来替换原图 */
+  applyEditResult() {
+    const app = getApp();
+    const r = app.globalData && app.globalData.editResult;
+    if (!r || r.recordId !== this.data.id) return;
+    app.globalData.editResult = null;
+
+    const saved = store.persistImage(r.path, 'photos');
+    const records = store.listRecords();
+    const rec = records.find((x) => x.id === r.recordId);
+    if (!rec) return;
+    const photo = (rec.photos || []).find((x) => x.id === r.photoId);
+    if (!photo) return;
+
+    const old = photo.path;
+    photo.path = saved;
+    if (rec.coverPath === old) rec.coverPath = saved;
+    store.updateRecord(r.recordId, { photos: rec.photos, coverPath: rec.coverPath });
+    store.removeFile(old);
+    wx.showToast({ title: '照片已更新', icon: 'success' });
   },
 
   /** 裁剪页完成后回来接管结果 */

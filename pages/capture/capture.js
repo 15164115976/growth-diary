@@ -235,12 +235,10 @@ Page({
   },
 
   async finishShot(still, livePath) {
-    let finalStill = still;
-    // 按拍照瞬间的真实角度转正，入库的永远是正图
-    const angle = this.data.shootAngle || 0;
-    if (angle) {
-      finalStill = await imageUtil.rotateImage(still, angle);
-    }
+    // 交给 EXIF 判断，而不是猜设备朝向：
+    // camera 输出的照片绝大多数本身就是正的，按陀螺仪再转一次反而会转歪。
+    // 只有图片自己声明了非正向（right/down/left）才真的转。
+    const finalStill = await imageUtil.normalizeOrientation(still);
     this.setData({
       mode: 'confirm',
       captured: finalStill,

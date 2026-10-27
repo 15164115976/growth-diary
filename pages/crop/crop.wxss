@@ -143,39 +143,75 @@
   top: 66.66%;
 }
 
-.corner {
+/* 8 个拖拽手柄：四角是方块，四边是短条 */
+.h {
   position: absolute;
-  width: 40rpx;
-  height: 40rpx;
-  border: 5rpx solid #fff;
+  background: #fff;
+  border-radius: 6rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.35);
 }
 
-.corner.tl {
-  left: -2rpx;
-  top: -2rpx;
-  border-right: none;
-  border-bottom: none;
+.h.tl,
+.h.tr,
+.h.bl,
+.h.br {
+  width: 34rpx;
+  height: 34rpx;
+  border-radius: 8rpx;
 }
 
-.corner.tr {
-  right: -2rpx;
-  top: -2rpx;
-  border-left: none;
-  border-bottom: none;
+.h.tl {
+  left: -17rpx;
+  top: -17rpx;
 }
 
-.corner.bl {
-  left: -2rpx;
-  bottom: -2rpx;
-  border-right: none;
-  border-top: none;
+.h.tr {
+  right: -17rpx;
+  top: -17rpx;
 }
 
-.corner.br {
-  right: -2rpx;
-  bottom: -2rpx;
-  border-left: none;
-  border-top: none;
+.h.bl {
+  left: -17rpx;
+  bottom: -17rpx;
+}
+
+.h.br {
+  right: -17rpx;
+  bottom: -17rpx;
+}
+
+.h.t,
+.h.b {
+  left: 50%;
+  width: 52rpx;
+  height: 14rpx;
+  margin-left: -26rpx;
+  border-radius: 7rpx;
+}
+
+.h.t {
+  top: -7rpx;
+}
+
+.h.b {
+  bottom: -7rpx;
+}
+
+.h.l,
+.h.r {
+  top: 50%;
+  width: 14rpx;
+  height: 52rpx;
+  margin-top: -26rpx;
+  border-radius: 7rpx;
+}
+
+.h.l {
+  left: -7rpx;
+}
+
+.h.r {
+  right: -7rpx;
 }
 
 .stage-tip {
@@ -230,7 +266,7 @@
   border-color: transparent;
 }
 
-.reset {
+.tool-btn {
   width: 96rpx;
   height: 64rpx;
   border-radius: 32rpx;
@@ -243,6 +279,6 @@
   flex-shrink: 0;
 }
 
-.reset:active {
+.tool-btn:active {
   background: rgba(255, 255, 255, 0.2);
 }

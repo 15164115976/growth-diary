@@ -290,8 +290,36 @@ function removeFile(path) {
 /* ------------------------------------------------------------------ *
  * 记录 CRUD
  * ------------------------------------------------------------------ */
+const CATEGORY_KEY = 'gd_categories_v1';
+let _catCache = null;
+
+/** 分类定义，允许用户改名/换图标，存在本地覆盖默认值 */
+function getCategories() {
+  if (_catCache) return _catCache;
+  const custom = readJSON(CATEGORY_KEY, {});
+  _catCache = CATEGORIES.map((c) => Object.assign({}, c, custom[c.key] || {}));
+  return _catCache;
+}
+
+function saveCategory(key, patch) {
+  const custom = readJSON(CATEGORY_KEY, {});
+  custom[key] = Object.assign({}, custom[key] || {}, patch || {});
+  writeJSON(CATEGORY_KEY, custom);
+  _catCache = null;
+  return getCategories();
+}
+
+function resetCategory(key) {
+  const custom = readJSON(CATEGORY_KEY, {});
+  delete custom[key];
+  writeJSON(CATEGORY_KEY, custom);
+  _catCache = null;
+  return getCategories();
+}
+
 function categoryOf(key) {
-  return CATEGORIES.find((c) => c.key === key) || CATEGORIES[0];
+  const list = getCategories();
+  return list.find((c) => c.key === key) || list[0];
 }
 
 function careTypeOf(key) {
@@ -360,6 +388,17 @@ function defaultCarePlan(category) {
   return plan;
 }
 
+/** 分类内重排（首页卡片拖动排序用） */
+function reorderInCategory(category, orderedIds) {
+  const records = listRecords();
+  orderedIds.forEach((id, i) => {
+    const r = records.find((x) => x.id === id);
+    if (r && r.category === category) r.catOrder = i;
+  });
+  saveAll(records);
+  return records;
+}
+
 function createRecord(input = {}) {
   const category = input.category || 'flower';
   const cat = categoryOf(category);
@@ -377,6 +416,7 @@ function createRecord(input = {}) {
     coverTs: 0,
     customCover: '', // 从相册导入的封面，优先于最新照片
     sortOrder: -1, // 越小越靠前，新建的排最前面
+    catOrder: -1, // 分类内顺序
     photos: [],
     careLogs: [],
     carePlan: defaultCarePlan(category),
@@ -595,6 +635,7 @@ const DEFAULT_SETTINGS = {
   // 拍摄
   livePhoto: true, // 拍照后录制动态片段
   liveDuration: 2200,
+  liveAuto: true, // 幻灯片里换图时自动播动图
   // 幻灯片
   aiTransition: false,
   aiEndpoint: '',
@@ -683,10 +724,15 @@ function getAll() {
 
 function groupByCategory() {
   const all = getAll();
-  return CATEGORIES.map((c) => ({
-    category: c,
-    records: all.filter((r) => r.category === c.key),
-  }));
+  return getCategories().map((c) => {
+    const records = all.filter((r) => r.category === c.key);
+    records.sort((a, b) => {
+      const sa = typeof a.catOrder === 'number' ? a.catOrder : 9999;
+      const sb = typeof b.catOrder === 'number' ? b.catOrder : 9999;
+      return sa - sb;
+    });
+    return { category: c, records };
+  });
 }
 
 /** 首次启动写入示例记录，避免首页空白 */
@@ -742,6 +788,9 @@ module.exports = {
   CARE_TYPES,
   MANUAL_TEMPLATES,
   categoryOf,
+  getCategories,
+  saveCategory,
+  resetCategory,
   careTypeOf,
   init,
   listRecords,
@@ -759,6 +808,7 @@ module.exports = {
   saveManual,
   normalizeOrder,
   reorderRecords,
+  reorderInCategory,
   setCover,
   saveCarePlan,
   defaultCarePlan,

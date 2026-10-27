@@ -26,19 +26,23 @@
     <view
       wx:if="{{ready}}"
       class="crop-box"
-      style="left:{{boxX}}px; top:{{boxY}}px; width:{{boxW}}px; height:{{boxH}}px"
+      style="left:{{box.x}}px; top:{{box.y}}px; width:{{box.w}}px; height:{{box.h}}px"
     >
       <view class="gv g1"></view>
       <view class="gv g2"></view>
       <view class="gh g1"></view>
       <view class="gh g2"></view>
-      <view class="corner tl"></view>
-      <view class="corner tr"></view>
-      <view class="corner bl"></view>
-      <view class="corner br"></view>
+      <view class="h tl"></view>
+      <view class="h tr"></view>
+      <view class="h bl"></view>
+      <view class="h br"></view>
+      <view class="h t"></view>
+      <view class="h b"></view>
+      <view class="h l"></view>
+      <view class="h r"></view>
     </view>
 
-    <view class="stage-tip" wx:if="{{ready}}">拖动移位 · 双指缩放</view>
+    <view class="stage-tip" wx:if="{{ready}}">拖边框调范围 · 框内拖动移图 · 双指缩放</view>
   </view>
 
   <view class="tools" style="padding-bottom:{{safeBottom + 20}}px">
@@ -55,6 +59,7 @@
         </view>
       </view>
     </scroll-view>
-    <view class="reset" bindtap="reset">复原</view>
+    <view class="tool-btn" bindtap="rotate">旋转</view>
+    <view class="tool-btn" bindtap="reset">复原</view>
   </view>
 </view>

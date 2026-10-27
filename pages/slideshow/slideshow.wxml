@@ -43,7 +43,7 @@
 
   <!-- 点击热区：左上一张 / 中间暂停 / 右下一张 -->
   <view class="hit hit-left" bindtap="prev"></view>
-  <view class="hit hit-mid" bindtap="togglePlay"></view>
+  <view class="hit hit-mid" bindtap="onShortTap"></view>
   <view class="hit hit-right" bindtap="next"></view>
 
   <!-- 顶部 -->
@@ -55,6 +55,9 @@
       <view class="title-wrap">
         <text class="title">{{record.name}}</text>
         <text class="sub">{{record.species || record.catName}} · 第 {{record.days}} 天</text>
+      </view>
+      <view class="edit-btn" bindtap="goEdit">
+        <text class="edit-ico">✎</text>
       </view>
       <view class="ai-btn {{aiMode ? 'on' : ''}}" bindtap="toggleAi">
         <view class="ai-dot"></view>
@@ -76,28 +79,25 @@
     <view class="b-day-row">
       <text class="b-day">{{current.dayLabel}}</text>
       <text class="b-gap">{{current.gap}}</text>
-      <view class="b-live-btn {{livePlaying ? 'on' : ''}}" wx:if="{{hasLive}}" catchtap="playLive">
+      <view class="b-live-btn {{liveAuto ? 'on' : ''}}" wx:if="{{hasLive}}" catchtap="toggleLiveAuto">
         <view class="b-live-dot"></view>
-        <text>{{livePlaying ? '播放中' : 'LIVE'}}</text>
+        <text>LIVE {{liveAuto ? '开' : '关'}}</text>
       </view>
     </view>
     <view class="b-note" wx:if="{{current.note}}">「{{current.note}}」</view>
     <view class="b-count mono">{{current.seq}} / {{total}}</view>
 
     <view class="swipe-tip">
-      <text class="st-up">↑ 拍摄日历</text>
+      <text class="st-up">← → 换图</text>
       <text class="st-sep">·</text>
-      <text class="st-down">↓ 养护记录</text>
+      <text class="st-up">↑ 日历</text>
+      <text class="st-sep">·</text>
+      <text class="st-down">↓ 养护</text>
     </view>
   </view>
 
   <!-- AI 生成提示 -->
   <view class="ai-hint" wx:if="{{aiHint}}">{{aiHint}}</view>
-
-  <!-- 暂停标识 -->
-  <view class="paused" wx:if="{{!playing && !calendarVisible && !careVisible}}">
-    <view class="play-tri"></view>
-  </view>
 
   <!-- ================= 拍摄日历 ================= -->
   <view class="panel-mask" wx:if="{{calendarVisible}}" bindtap="closeCalendar">

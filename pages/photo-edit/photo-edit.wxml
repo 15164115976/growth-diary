@@ -1,0 +1,74 @@
+<view class="page">
+  <view style="height:{{safeTop}}px"></view>
+
+  <view class="nav">
+    <view class="nav-btn" bindtap="close"><view class="x"></view></view>
+    <view class="nav-mid">
+      <text class="nav-title">调整照片</text>
+      <text class="nav-sub">{{index + 1}} / {{photos.length}}</text>
+    </view>
+    <view class="nav-save {{saving ? 'busy' : ''}}" bindtap="save">{{saving ? '…' : '保存'}}</view>
+  </view>
+
+  <view
+    class="stage"
+    id="stage"
+    bindtouchstart="onTouchStart"
+    bindtouchmove="onTouchMove"
+    bindtouchend="onTouchEnd"
+    bindtouchcancel="onTouchEnd"
+  >
+    <image
+      wx:if="{{cur}}"
+      class="photo"
+      src="{{cur.path}}"
+      mode="scaleToFill"
+      style="width:{{baseW}}px; height:{{baseH}}px; margin-left:{{offW}}px; margin-top:{{offH}}px; transform: translate({{tx}}px, {{ty}}px) rotate({{rot}}deg) scale({{scale}})"
+    />
+    <view class="tip">双指旋转缩放 · 单指移动</view>
+  </view>
+
+  <!-- 工具条 -->
+  <view class="tools">
+    <view class="tool" bindtap="rotateStep" data-deg="-90">
+      <text class="tool-ico">↺</text>
+      <text class="tool-tx">左转</text>
+    </view>
+    <view class="tool" bindtap="rotateStep" data-deg="90">
+      <text class="tool-ico">↻</text>
+      <text class="tool-tx">右转</text>
+    </view>
+    <view class="tool" bindtap="resetOne">
+      <text class="tool-ico">⟲</text>
+      <text class="tool-tx">复位</text>
+    </view>
+    <view class="tool-deg mono">{{rot}}°</view>
+  </view>
+
+  <!-- 缩略图：左右切换查看，调整各自保留 -->
+  <scroll-view
+    class="thumbs"
+    scroll-x
+    enhanced
+    show-scrollbar="{{false}}"
+    scroll-into-view="th-{{index}}"
+    scroll-with-animation
+  >
+    <view class="thumbs-inner">
+      <view
+        class="th {{index === item.i ? 'on' : ''}}"
+        wx:for="{{photos}}"
+        wx:key="id"
+        wx:for-item="item"
+        wx:for-index="i"
+        id="th-{{i}}"
+        data-index="{{i}}"
+        bindtap="pickPhoto"
+      >
+        <image class="th-img" src="{{item.path}}" mode="aspectFill" lazy-load />
+      </view>
+    </view>
+  </scroll-view>
+
+  <view style="height:{{safeBottom + 12}}px"></view>
+</view>

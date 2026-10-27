@@ -75,3 +75,32 @@ function compressTo(src, maxSide = 1080, quality = 80) {
 }
 
 module.exports = { rotateImage, compressTo };
+
+/**
+ * 按 EXIF 方向把图片转正 —— 这是最可靠的做法
+ *
+ * 不去猜设备朝向，而是问微信：「这张图本身是什么朝向？」
+ * wx.getImageInfo 会把 EXIF 里的 Orientation 翻译成 up/down/left/right，
+ * 非 up 才需要真的转一次，是 up 就原样返回，零开销。
+ *
+ * 为什么不再用传感器角度：camera 输出的照片本身可能已经是"所见即所得"的正图，
+ * 再按陀螺仪转一次就会过头 —— 之前方向一直不对就是这个原因。
+ */
+function normalizeOrientation(src) {
+  return new Promise((resolve) => {
+    wx.getImageInfo({
+      src,
+      success: (info) => {
+        const o = info.orientation;
+        // left / right 的含义是「相对正向逆/顺时针转了 90」，需要转回来
+        const degMap = { right: 90, down: 180, left: 270 };
+        const deg = degMap[o];
+        if (!deg) return resolve(src); // up 或镜像类，保持原样
+        rotateImage(src, deg).then(resolve);
+      },
+      fail: () => resolve(src),
+    });
+  });
+}
+
+module.exports.normalizeOrientation = normalizeOrientation;

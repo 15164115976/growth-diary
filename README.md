@@ -237,9 +237,9 @@ growth-diary/
 │   ├── index/      主页：四类分组 + 继续观察 + 漂流瓶入口
 │   ├── detail/     记录详情：主视觉、三入口、时间线、投瓶
 │   ├── capture/    拍照：叠底参考 + 重力翻转 + Live 录制
-│   ├── slideshow/  幻灯片：交叉溶解 + Ken Burns + AI 过渡 + Live 播放
-│   ├── care/       养护手册 / 养护记录
-│   ├── gallery/    影集 tab
+│   ├── slideshow/  查看器：原图播放 + LIVE 开关 + 上下滑面板 + 横屏
+│   ├── care/       养护手册 / 养护记录 / 养护计划
+│   ├── gallery/    影集 tab：左滑置顶排序删除
 │   ├── profile/    我的：启动方式、拍摄、识别、漂流瓶、数据
 │   ├── edit/       新建 / 编辑记录
 │   ├── crop/       自由裁剪：拖边框、平移、缩放、旋转、导出
@@ -250,15 +250,44 @@ growth-diary/
 │   ├── bottle/     漂流瓶全部动作（单个云函数里按 action 路由）
 │   └── recognize/  生物识别（调用任意 OpenAI 兼容的视觉模型）
 ├── brand/          名称、简介与三套 144px 头像
+├── scripts/
+│   ├── install-git-hooks.sh  安装 post-commit 钩子（提交后自动推送）
+│   └── sync.sh               一键暂存 + 提交 + 推送，并校验远程是否追平
 └── utils/
     ├── store.js       数据层（记录、照片、Live、养护、设置、手册模板）
     ├── bottle.js      漂流瓶服务（云开发 / 本地演示双通道）
     ├── recognize.js   生物识别（云函数 / 自建接口 / 降级）
     ├── transition.js  过渡引擎（本地 + AI 可插拔）
-    ├── orientation.js 重力方向（防抖）
-    ├── image.js       图片旋转与压缩
+    ├── orientation.js 重力方向（防抖、四向）
+    ├── image.js       图片方向校正、旋转压缩、构图相似度
     └── date.js        日期与「第 N 天」计算
 ```
+
+## 提交与推送
+
+推送失败在非交互环境里是**静默**的——只打一行报错就过去，代码看着提交了，远程还是旧的。这里用两层防护：
+
+**① 钩子（装一次，长期生效）**
+
+```bash
+sh scripts/install-git-hooks.sh
+```
+
+之后每次 `git commit` 都会自动 push，结果写进 `.git/push.log`：
+
+```
+2026-10-27 16:10:32 OK   6f7631c -> origin/master
+```
+
+失败会记成 `FAIL` 并附上原始报错，不影响提交本身，事后照着日志重推即可。
+
+**② 一键脚本（推荐日常用）**
+
+```bash
+sh scripts/sync.sh "feat: 这次改了什么"
+```
+
+暂存全部改动 → 有改动才提交 → 推送 → **比对本地与远程 HEAD**，不一致直接报错退出。提交后钩子也会推一次，重复推送是无害的 `Everything up-to-date`。
 
 ## 数据怎么存
 
